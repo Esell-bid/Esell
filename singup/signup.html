@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SIGNUP</title>
+        <link rel="stylesheet" type="text/css" href="signup.css">
+        <img src="pics/signup.png" alt="header image" width="100%">
+    </head>
+    <body>
+        <div class="create">
+            <h2>CREATE AN ACCOUNT </h2>
+        </div>
+        <br><br>
+        <form  method="POST" enctype="multipart/form-data"  id="myform">
+            <div class="createlogin">
+                <div class="b">
+                    <label>CREATE LOGIN :</label>
+                </div>
+                <div class="rect1">
+                    <div class="labels">
+                        <label class="d">USERNAME :</label><br><br>
+                        <label class="e">PASSWORD :</label><br><br>
+                        <label>CONFIRM PASSWORD :</label><br><br>
+                    </div>
+                    <div class="inputs">
+                        <input type="text" name="username" class="a" required placeholder="Username"><br><br>
+                        <input type="password" name="password" class="a" required placeholder="Password"><br><br>
+                        <input type="password" name="confirmPassword" class="a" required placeholder="Confirm password"><br><br>
+                    </div>
+                    <div class="uploadimg">
+                        <label for="file">Upload Images:</label>
+                        <input type="file" name="file"  id="file"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contactinfo">
+                <div class="b">
+                    <label>YOUR CONTACT INFORMATION :</label>
+                </div>
+                <div class="rect1">
+                    <div class="labels">
+                        <label class="e">EMAIL :</label><br><br>
+                        <label>CONTACT NUMBER :</label><br><br>
+                    </div>
+                    <div class="inputs">
+                        <input type="email" name="email" class="a" required placeholder="Email"><br><br>
+                        <input type="text" name="phoneNumber" class="a" required placeholder="Phone number"><br><br>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="personaldet">
+                <div class="b">
+                    <label>PERSONAL DETAILS :</label>
+                </div>
+                <div class="rect1">
+                    <div class="labels">
+                        <label class="e">FIRSTNAME :</label><br><br>
+                        <label>LASTNAME :</label><br><br>
+                    </div>
+                    <div class="inputs">
+                        <input type="text" name="firstName" class="a" required placeholder="Firstname"><br><br>
+                        <input type="text" name="lastName" class="a" required placeholder="Lastname"><br><br>
+                    </div>
+                    <div class="chkbx">
+                        <input type="checkbox" name="isDisabled" id="isDisabled"> <!-- Add the checkbox field -->
+                        <label for="isDisabled">Differently Abled</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="Addressinfo">
+                <div class="b">
+                    <label>ADDRESS INFORMATION :</label>
+                </div>
+                <div class="rect1">
+                    <div class="labels">
+                        <label class="c">STREET ADDRESS 1 :</label><br><br>
+                        <label class="c">STREET ADDRESS 2 :</label><br><br>
+                        <label class="d">CITY :</label><br><br>
+                        <label class="d">STATE :</label><br><br>
+                        <label class="e" >COUNTRY :</label><br><br>
+                        <label class="e">PINCODE :</label><br><br>
+            
+                    </div>
+                    <div class="inputs">
+                        <input type="text" name="addressLine1" class="a" required placeholder="Addressline 1"><br><br>
+                        <input type="text" name="addressLine2" class="a" required placeholder="Addressline 2"><br><br>
+                        <input type="text" name="city" class="a" required placeholder="City"><br><br>
+                        <input type="text" name="state" class="a" required placeholder="State"><br><br>
+                        <input type="text" name="country" class="a" required placeholder="Country"><br><br>
+                        <input type="text" name="pincode" class="a" required placeholder="Pincode"><br><br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="Bankdet">
+                <div class="b">
+                    <label>BANK DETAILS :</label>
+                </div>
+                <div class="rect1">
+                    <div class="labels">
+                        <label class="d">ACCOUNT NUMBER :</label><br><br>
+                        <label class="e">IFSC CODE :</label><br><br>
+                        <label class="e">UPI ID :</label><br><br>
+                        
+                    </div>
+                    <div class="inputs">
+                        <input type="text" name="accountNumber" class="a" required placeholder="Account number"><br><br>
+                        <input type="text" name="ifscCode" class="a" required placeholder="IFSC"><br><br>
+                        <input type="text" name="upiId" class="a" required placeholder="UPI ID"><br><br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="Agreements">
+                <div class="b">
+                    <label>AGREEMENTS :</label>
+                </div>
+                <div class="rect1">
+                    <div class="chkbx">
+                        <input type="checkbox" name="termsAndConditions" required>
+                        <a href="/T&C.pdf">I Agree To The Terms And Conditions</a>
+                    </div>
+                    
+                    <!-- <div class="captcha">
+                        <div class="spinner">
+                            <label>
+                                <input type="checkbox" onclick=getCheckboxValue()>
+                                <span class="checkmark"><span>&nbsp;</span></span>
+                            </label>
+                        </div>
+                        <div class="text">
+                            I'm not a robot
+                        </div>
+                        <div class="logo">
+                            
+                            <p>reCAPTCHA</p>
+                            <small>Privacy - Terms</small>
+                        </div>
+
+                    </div> -->
+                    <div class="butto">
+                        <button type="submit">SUBMIT</button>
+                    </div>
+                    
+                </div>
+            </div>
+        </form>
+
+        <script>
+           // Get a reference to the form element
+const frm = document.getElementById("myform");
+
+// Add a submit event listener to the form
+frm.addEventListener("submit", function (event) {
+  event.preventDefault();
+  const form = document.forms.myform;
+  const username = form.username.value;
+  const password = form.password.value;
+  const email = form.email.value;
+  const phoneNumber = form.phoneNumber.value;
+  const firstname = form.firstName.value;
+  const lastname = form.lastName.value;
+  const addressLine1 = form.addressLine1.value;
+  const addressLine2 = form.addressLine2.value;
+  const city = form.city.value;
+  const state = form.state.value;
+  const Country = form.country.value;
+  const pincode = form.pincode.value;
+  const accountNumber = form.accountNumber.value;
+  const ifscCode = form.ifscCode.value;
+  const upiId = form.upiId.value;
+  const isDisabled = form.isDisabled.checked; // Check if "Differently Abled" checkbox is checked
+
+  const formData = {
+    username: username,
+    password: password,
+    email: email,
+    phonenumber: phoneNumber,
+    firstname: firstname,
+    lastname: lastname,
+     isDisabled: isDisabled,
+    addressLine1: addressLine1,
+    addressLine2: addressLine2,
+    city: city,
+    state: state,
+    Country: Country,
+    pincode: pincode,
+    accountNumber: accountNumber,
+    ifscCode: ifscCode,
+    upiId: upiId,
+    // Include the value of "Differently Abled" checkbox
+  };
+
+  // Send a POST request to the server
+  const response = fetch("http://localhost:3000/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Response from server:", data);
+      // Handle the response from the server
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      // Handle the error
+    });
+});
+
+        </script>
+
+    </body>
+</html>
