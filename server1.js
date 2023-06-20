@@ -5,7 +5,7 @@ const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
-const User = require('./users');
+
 
 const app = express();
 const port = 3000;
@@ -29,7 +29,157 @@ mongoose.connect(`${url}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology
   .catch((error) => {
     console.error('Error connecting to MongoDB:', error);
   });
+// Define a schema for the user collection
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  phoneNumber: {
+    type: String,
+    required: true
+  },
+  firstName: {
+    type: String,
+    required: true
+  },
+  lastName: {
+    type: String,
+    required: true
+  },
+  isDisabled:{
+    type:Boolean
+  },
+  address: {
+    streetAddress1: {
+      type: String,
+      required: true
+    },
+    streetAddress2: {
+      type: String
+    },
+    city: {
+      type: String,
+      required: true
+    },
+    state: {
+      type: String,
+      required: true
+    },
+    country: {
+      type: String,
+      required: true
+    },
+    pincode: {
+      type: String,
+      required: true
+    }
+  },
+  bankDetails: {
+    accountNumber: {
+      type: String,
+      required: true
+    },
+    ifscCode: {
+      type: String,
+      required: true
+    },
+    upiId: {
+      type: String,
+      required: true
+    }
+  }
+});
 
+
+// Create a user model based on the schema
+const User = mongoose.model('User', userSchema);
+
+
+
+app.use(cors(
+  {
+    origin: '*'
+  }
+))
+app.use(express.json());
+app.use(express.static(__dirname + '/forgotpass')); 
+app.use(express.urlencoded({ extended: true }));
+// Create a route for handling the signup form submission
+app.post('/signup', (req, res) => {
+  // Extract the form data from the request
+  const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
+  const bankDetails = {
+    accountNumber,
+    ifscCode,
+    upiId
+  }
+  const address = {
+    streetAddress1: addressLine1,
+    streetAddress2: addressLine2,
+    country: Country,
+    state,
+    pincode,
+    city,
+  }
+  // Create a new user instance
+  const newUser = new User({
+    username,
+    password,
+    email,
+    phoneNumber: phonenumber,
+    firstName: firstname,
+    lastName: lastname,
+    isDisabled,
+    address,
+    bankDetails,
+  });
+
+  console.log(newUser);
+
+
+   //Save the user to the database
+  User.create(newUser)
+   .then(() => {
+    res.send('User created successfully');
+  })
+ .catch((error) => {
+     console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Error creating user' });
+   });
+});
+
+
+
+
+
+// LoGIN FORM
+
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.findOne({ username, password });
+    if (user) {
+      // Successful login
+      res.json({ message: 'Login successful' });
+    } else {
+      // Invalid credentials
+      res.status(401).json({ error: 'Invalid username or password' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 // Define a schema for the product
 const productSchema = new mongoose.Schema({
   name: String,
@@ -39,7 +189,7 @@ const productSchema = new mongoose.Schema({
   price: Number,
   currentBid: Number,
   date: Date,
-  time: String,
+  email: String,
   images: [String], // Store an array of image URLs
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -67,15 +217,17 @@ const storage = new CloudinaryStorage({
 // Multer upload instance
 const upload = multer({ storage: storage });
 
+// ...
+
 // Define the route for form submission
 app.post('/submit-form', upload.array('images', 5), async (req, res) => {
   // Get the form data from the request body
-  const { name, category, description, quantity, price, currentBid, date, time } = req.body;
+  const { name, category, description, quantity, price, currentBid, date, email } = req.body;
   const images = req.files.map(file => file.path); // Store an array of Cloudinary URL paths
 
   try {
     // Find the user in the MongoDB collection based on the email
-    const user = await User.findOne({ email: req.user.email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -90,7 +242,7 @@ app.post('/submit-form', upload.array('images', 5), async (req, res) => {
       price,
       currentBid,
       date,
-      time,
+      email,
       images,
       user: user._id // Assign the user ID to the product
     });
@@ -110,6 +262,9 @@ app.post('/submit-form', upload.array('images', 5), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// ...
+
 
 // Rest of your code...
 
@@ -190,7 +345,7 @@ app.get('/generate-pages', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
+///// login/////
 
 
 
