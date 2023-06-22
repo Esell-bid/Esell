@@ -263,31 +263,22 @@ app.post('/submit-form', upload.array('images', 5), async (req, res) => {
   }
 });
 
-// ...
-
-
-// Rest of your code...
-
-
-
-
-// ...Rest of the code remains the same...
 
 
 ////////////////////--display pro---////////////////////////////////////
 // Set up route to retrieve product details
 // Set up route to retrieve product details
-app.get('/products', async (req, res) => {
+app.get('/acceptedproducts', async (req, res) => {
   try {
-    const products = await Product.find().exec();
-    res.json(products);
+    const acceptedproducts = await Product.find().exec();
+    res.json(acceptedproducts);
   } catch (error) {
     console.error('Error retrieving product details from MongoDB:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 // Fetch a single product by ID
-app.get('/products/:id', async (req, res) => {
+app.get('/acceptedproducts/:id', async (req, res) => {
   try {
     const productId = req.params.id;
     const product = await Product.findById(productId);
@@ -304,48 +295,70 @@ app.get('/products/:id', async (req, res) => {
 });
 
 /////////// pro details display///////////////////
-app.post('/update-bid', async (req, res) => {
-  const { productId, bidAmount } = req.body;
 
-  if (!productId || !bidAmount) {
-    return res.status(400).json({ error: 'Invalid input' });
-  }
-
-  try {
-    // Update the currentBid value in the database
-    const updatedProduct = await Product.findByIdAndUpdate(productId, { currentBid: bidAmount }, { new: true });
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-    return res.status(200).json({ message: 'Bid updated successfully', product: updatedProduct });
-  } catch (error) {
-    console.error('Error updating bid:', error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
 
 // Define the route for generating multiple pages
 app.get('/generate-pages', async (req, res) => {
   try {
-    // Fetch the product data from MongoDB
-    const products = await Product.find();
+    const acceptedproducts    = await Product.find();
+    const renderedPages = [];
 
-    // Render the 'product-details' template for each product
-    products.forEach(product => {
-      res.render('product-details', { product });
+    acceptedproducts.forEach(product => {
+      const renderedPage = res.render('product-details', { product });
+      renderedPages.push(renderedPage);
     });
+
+    res.send(renderedPages.join('')); // Combine and send the rendered pages
   } catch (error) {
     console.error('Error fetching product data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-///// login/////
 
+const bidSchema = new mongoose.Schema({
+  productId: String,
+  currentBid: Number,
+});
+const Bid = mongoose.model('Bid', bidSchema);
+app.post('/bids', (req, res) => {
+  const { productId, currentBid } = req.body;
 
+  // Create a new Bid instance
+  const bid = new Bid({ productId, currentBid });
 
+  // Save the bid to the database
+  bid.save()
+  .then(() => {
+    res.sendStatus(200);
+  })
+  .catch((err) => {
+    console.error('Error saving bid:', err);
+    res.status(500).json({ error: 'Error saving bid' });
+  });
+});
+app.get('/bids/:productId', (req, res) => {
+  const productId = req.params.productId;
+
+  // Find the latest bid for the given product
+  Bid.findOne({ productId })
+    .sort({ currentBid: -1 }) // Sort in descending order of currentBid
+    .exec()
+    .then((bid) => {
+      if (bid) {
+        res.status(200).json({ currentBid: bid.currentBid });
+      } else {
+        res.status(404).json({ error: 'No bid found for the product' });
+      }
+    })
+    .catch((err) => {
+      console.error('Error fetching current bid:', err);
+      res.status(500).json({ error: 'Error fetching current bid' });
+    });
+});
