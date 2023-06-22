@@ -9,7 +9,7 @@ const port = 8000;
 const bodyParser = require('body-parser');
 const async = require('hbs/lib/async');
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net/esell2024?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net/esell2024', { useNewUrlParser: true, useUnifiedTopology: true,family:4 })
   .then(() => {
     console.log('Connected to MongoDB');
   })
@@ -287,112 +287,38 @@ app.post('/update-profile', (req, res) => {
 
 //forgot password
 
-const Mailgen = require('mailgen');
-
-const { EMAIL, PASSWORD } = require('./env')
-
-/** send mail from testing account */
-const signup = async (req, res) => {
-
-    /** testing account */
-    let testAccount = await nodemailer.createTestAccount();
-
-      // create reusable transporter object using the default SMTP transport
-    let transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-            user: testAccount.user, // generated ethereal user
-            pass: testAccount.pass, // generated ethereal password
-        },
-    });
-
-    let message = {
-        from: '"Fred Foo 👻" <foo@example.com>', // sender address
-        to: "bar@example.com, baz@example.com", // list of receivers
-        subject: "Hello ✔", // Subject line
-        text: "Successfully Register with us.", // plain text body
-        html: "<b>Successfully Register with us.</b>", // html body
-      }
 
 
-    transporter.sendMail(message).then((info) => {
-        return res.status(201)
-        .json({ 
-            msg: "you should receive an email",
-            info : info.messageId,
-            preview: nodemailer.getTestMessageUrl(info)
-        })
-    }).catch(error => {
-        return res.status(500).json({ error })
-    })
 
-    // res.status(201).json("Signup Successfully...!");
-}
+app.post('/forgor-password', (req, res) => {
+  const { email } = req.body;
 
-/** send mail from real gmail account */
-const getbill = (req, res) => {
+  // Create reusable transporter object using the default SMTP transport
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'esellbid@gmail.com',
+      pass: 'xydtsjpmirtyjkwo',
+    },
+  });
 
-    const { userEmail } = req.body;
+  const mailOptions = {
+    from: 'esellbid@gmail.com',
+    to: email,
+    subject: 'Forgot Password',
+    text: ' To reset password click this link \n http://127.0.0.1:5500/project/forgotpass/link.html',
+  };
 
-    let config = {
-        service : 'gmail',
-        auth : {
-            user: EMAIL,
-            pass: PASSWORD
-        }
+  // Send the email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(error)
+      res.status(500).json({ error: error });
+    } else {
+      console.log('Email sent:', info.response);
+      res.status(200).json({ message: 'Password reset email sent successfully' });
     }
-
-    let transporter = nodemailer.createTransport(config);
-
-    let MailGenerator = new Mailgen({
-        theme: "default",
-        product : {
-            name: "Mailgen",
-            link : 'https://mailgen.js/'
-        }
-    })
-
-    let response = {
-        body: {
-            name : "Daily Tuition",
-            intro: "Your bill has arrived!",
-            table : {
-                data : [
-                    {
-                        item : "Nodemailer Stack Book",
-                        description: "A Backend application",
-                        price : "$10.99",
-                    }
-                ]
-            },
-            outro: "Looking forward to do more business"
-        }
-    }
-
-    let mail = MailGenerator.generate(response)
-
-    let message = {
-        from : EMAIL,
-        to : userEmail,
-        subject: "Place Order",
-        html: mail
-    }
-
-    transporter.sendMail(message).then(() => {
-        return res.status(201).json({
-            msg: "you should receive an email"
-        })
-    }).catch(error => {
-        return res.status(500).json({ error })
-    })
-
-    // res.status(201).json("getBill Successfully...!");
-}
+  });
+});
 
 
-module.exports = {
-    signup,
-    getbill
-}
