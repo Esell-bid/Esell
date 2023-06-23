@@ -1,5 +1,5 @@
 //SING UP FORM
-
+const bcrypt = require('bcrypt');
 const express = require('express');
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
@@ -290,10 +290,8 @@ app.post('/update-profile', (req, res) => {
 
 
 
-app.post('/forgor-password', (req, res) => {
+app.post('/forgor-password', async (req, res) => {
   const { email } = req.body;
-
-  // Create reusable transporter object using the default SMTP transport
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
@@ -309,16 +307,42 @@ app.post('/forgor-password', (req, res) => {
     text: ' To reset password click this link \n http://127.0.0.1:5500/project/forgotpass/link.html',
   };
 
-  // Send the email
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(error)
-      res.status(500).json({ error: error });
+  // Create reusable transporter object using the default SMTP transport
+
+ var user = await User.findOne({ email });
+ console.log(user);
+    if (user) {
+      console.log(email);
+      console.log(user.email);
+      // Compare the provided password with the stored hashed password
+      var match = email === user.email;
+        console.log(match);
+          if (match) {
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.error(error)
+                res.status(500).json({ error: error });
+              } else {
+                console.log('Email sent:', info.response);
+                res.status(200).json({ message: 'Password reset email sent successfully' });
+              }
+            });
+            // Passwords match, user is authenticated
+          } else {
+            // Passwords don't match, authentication failed
+            res.status(401).json({ message: 'Email not registered' });
+          }
     } else {
-      console.log('Email sent:', info.response);
-      res.status(200).json({ message: 'Password reset email sent successfully' });
+      // User not found
+      res.status(404).json({ message: 'User not found' });
     }
-  });
-});
+  })
+
+
+
+
+  // Send the email
+ 
+
 
 
