@@ -86,13 +86,8 @@ const userSchema = new mongoose.Schema({
     }
   }
 });
-
-
 // Create a user model based on the schema
 const User = mongoose.model('User', userSchema);
-
-
-
 app.use(cors(
   {
     origin: '*'
@@ -137,11 +132,9 @@ app.post('/signup', async (req, res) => {
     address,
     bankDetails,
   });
-
-    // Save the user to the database
+// Save the user to the database
     await newUser.save();
-
-    // Send registration email to the user
+// Send registration email to the user
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
@@ -173,9 +166,6 @@ app.post('/signup', async (req, res) => {
 });
 
 
-
-
-
 // LoGIN FORM
 
 app.post('/login', async (req, res) => {
@@ -200,7 +190,6 @@ app.post('/login', async (req, res) => {
 
 
 //LOGIN 
-
 
 
 // Middleware to parse JSON data
@@ -271,14 +260,7 @@ app.post('/update-profile', (req, res) => {
     });
 });
 
-
-
-
-
 //forgot password
-
-
-
 
 app.post('/forgor-password', async (req, res) => {
   const { email } = req.body;
@@ -329,7 +311,7 @@ app.post('/forgor-password', async (req, res) => {
   })
 
 
-//ADMIN 
+//ADMIN CONFIRMATION
 
 app.get('/admin2/users', (req, res) => {
     
@@ -409,4 +391,3 @@ try {
   res.status(500).json({ error: "An error occurred" });
 }
 });
-
