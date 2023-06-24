@@ -104,37 +104,53 @@ app.listen(3000, () => {
 
 
 //EMAIL FOR SIGNUP
+// EMAIL FOR SIGNUP
 app.post('/signup', async (req, res) => {
-  // Extract the form data from the request
-   const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
-  const bankDetails = {
-    accountNumber,
-    ifscCode,
-    upiId
-  }
-  const address = {
-    streetAddress1: addressLine1,
-    streetAddress2: addressLine2,
-    country: Country,
-    state,
-    pincode,
-    city,
-  }
-  // Create a new user instance
- try{ const newUser = new User({
-    username,
-    password,
-    email,
-    phoneNumber: phonenumber,
-    firstName: firstname,
-    lastName: lastname,
-    isDisabled,
-    address,
-    bankDetails,
-  });
-// Save the user to the database
+  try {
+    // Extract the form data from the request
+    const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
+
+    // Check if the email already exists in the database
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      res.json('Email already exists')
+      return res.status(400);
+    }
+    else{
+
+    const bankDetails = {
+      accountNumber,
+      ifscCode,
+      upiId
+    }
+    const address = {
+      streetAddress1: addressLine1,
+      streetAddress2: addressLine2,
+      country: Country,
+      state,
+      pincode,
+      city,
+    }
+
+    // Create a new user instance
+    const newUser = new User({
+      username,
+      password,
+      email,
+      phoneNumber: phonenumber,
+      firstName: firstname,
+      lastName: lastname,
+      isDisabled,
+      address,
+      bankDetails,
+    });
+
+    // Save the user to the database
     await newUser.save();
-// Send registration email to the user
+    res.json('success')
+  }
+
+    // Send registration email to the user
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
@@ -164,6 +180,7 @@ app.post('/signup', async (req, res) => {
     res.status(500).json({ error: 'Error creating user' });
   }
 });
+
 
 
 // LoGIN FORM
