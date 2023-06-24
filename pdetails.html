@@ -9,77 +9,63 @@
       background-image: url('bg2.png');
       background-repeat: no-repeat;
       background-size: 1560px 1085px;
+      font-family: Arial, sans-serif;
     }
    
     .container {
       max-width: 800px;
       margin: 0px auto;
-      padding: 0px;
+      padding: 20px;
       border: 8px solid #090909;
       text-align: center;
+      background-color: #fff;
     }
 
+    .card {
+      margin-bottom: 20px;
+      padding: 20px;
+    }
 
-.pic {
-  margin-top: 50px;
-  margin-left: 150px;
-  width: 60%;
-  height: 250px;
-  background-color: #fff;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
+    .pic {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-.product-image {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+    .product-image {
+      width: 100%;
+      max-height: 250px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
 
-    h1 {
-      text-align: center;
-      font-size: 45px;
+    h2 {
+      font-size: 30px;
+      margin-top: 0;
+      margin-bottom: 10px;
     }
     
+    p {
+      font-size: 18px;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
     .timer {
-      text-align: center;
       font-size: 24px;
       font-weight: bold;
       margin-top: 20px;
+      margin-bottom: 40px;
       color: #333;
     }
-    
-   
-    
-    .product-info {
-      margin-bottom: 20px;
-    }
-    
-    .product-info h2 {
-      text-align: center;
-      margin-top: 0;
-      font-size: 35px;
-    }
-    
-    .product-info p {
-      margin: 0;
-      font-size: 25px;
-    }
-    
-    .bid-section {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    
+
     .bid-input {
-      width: 200px;
+      width: 150px;
       padding: 5px;
       margin-right: 10px;
     }
-    
+
     .bid-button {
       padding: 5px 10px;
       background-color: #007bff;
@@ -87,49 +73,44 @@
       border: none;
       cursor: pointer;
     }
-    
+
     .bid-button:hover {
       background-color: #0056b3;
     }
-    
+
     .current-bid {
-      text-align: center;
       margin-bottom: 20px;
-      font-size: 35px;
+      font-size: 24px;
     }
-    
+
     .starting-price {
-      text-align: center;
       margin-bottom: 20px;
-      font-size: 35px;
+      font-size: 24px;
     }
+
+    .bids-container {
+      margin-top: 20px;
+      text-align: left;
+    }
+
     .bid {
-      order: 1; /* Initial order, can be any number as per your requirement */
-    }
-    
-    /* Example styling for the bid element */
-    .bid:nth-child(1) {
+      padding: 10px;
+      margin-bottom: 10px;
       background-color: #f9f9f9;
     }
-    
-    .bid:nth-child(2) {
+
+    .bid:nth-child(2n) {
       background-color: #f0f0f0;
     }
-    
+
     .logo {
-      padding-left: 0px;
-      padding-top: 0px;
       width: 140px;
-      height: 18vh;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="productContainer">
- 
-  </div>
-  
-  
+  <div class="container" id="productContainer"></div>
 
   <script>
     // Function to start the timer
@@ -147,54 +128,83 @@
         display.textContent = hours + ":" + minutes + ":" + seconds;
 
         if (--timer < 0) {
-
-          alert("Bid time has expired winner will be provided with an  Email soon");
+          alert("Bid time has expired. The winner will be notified by email.");
         }
       }, 1000);
     }
 
     async function fetchProductDetails() {
-  try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
-    const response = await fetch(`http://localhost:3000/acceptedproducts/${productId}`);
-    const product = await response.json();
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        const response = await fetch(`http://localhost:3000/acceptedproducts/${productId}`);
+        const product = await response.json();
 
-    if (response.ok) {
-      const bidResponse = await fetch(`http://localhost:3000/bids/${productId}`);
-      const bidData = await bidResponse.json();
+        if (response.ok) {
+          const bidResponse = await fetch(`http://localhost:3000/bids/${productId}`);
+          const bidData = await bidResponse.json();
 
-      if (bidResponse.ok) {
-        displayProductDetails(product, productId, bidData.currentBid);
-      } else {
-        console.error('Error fetching current bid:', bidData.error);
-        displayProductDetails(product, productId, null);
+          if (bidResponse.ok) {
+            displayProductDetails(product, productId, bidData.currentBid);
+          } else {
+            console.error('Error fetching current bid:', bidData.error);
+            displayProductDetails(product, productId, null);
+          }
+        } else {
+          console.error('Error fetching product details:', product.error);
+        }
+      } catch (error) {
+        console.error('Error fetching product details:', error);
       }
-    } else {
-      console.error('Error fetching product details:', product.error);
     }
-  } catch (error) {
-    console.error('Error fetching product details:', error);
-  }
-}
-function displayProductDetails(product, productId, currentBidData) {
+
+    function saveBid(productId, currentBid) {
+      const email = localStorage.getItem('userEmail');
+
+      // Create the bid object with the productId, currentBid, and email
+      const bid = {
+        productId: productId,
+        currentBid: currentBid,
+        email: email
+      };
+
+      fetch('http://localhost:3000/bids', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bid)
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Bid placed successfully!');
+        } else {
+          console.error('Error saving bid:', response.status);
+        }
+      })
+      .catch(error => {
+        console.error('Error saving bid:', error);
+      });
+    }
+
+    function displayProductDetails(product, productId, currentBidData) {
       const productContainer = document.getElementById('productContainer');
+      const card = document.createElement("div");
+      card.classList.add("card");
 
-  const card = document.createElement("div");
-  card.classList.add("card");
+      const pic = document.createElement("div");
+      pic.classList.add("pic");
+      card.appendChild(pic);
 
-  const pic = document.createElement("div");
-  pic.classList.add("pic");
-  card.appendChild(pic);
+      // Iterate over the images array and create img elements within the pic container
+      product.images.forEach((imageUrl) => {
+        const image = document.createElement("img");
+        image.src = imageUrl;
+        image.alt = "Product Image";
+        image.classList.add("product-image");
+        pic.appendChild(image);
+      });
 
-  // Iterate over the images array and create img elements within the pic container
-  product.images.forEach((imageUrl) => {
-    const image = document.createElement("img");
-    image.src = imageUrl;
-    image.alt = "Product Image";
-    image.classList.add("product-image");
-    pic.appendChild(image);
-  });
       const title = document.createElement("h2");
       title.textContent = product.name;
       card.appendChild(title);
@@ -211,18 +221,15 @@ function displayProductDetails(product, productId, currentBidData) {
       endDate.textContent = "End Date: " + product.date;
       card.appendChild(endDate);
 
-      const time = document.createElement("p");
-      time.textContent = "Starting Time: " + product.time;
-      card.appendChild(time);
-
       const price = document.createElement("p");
+      price.classList.add("starting-price");
       price.textContent = "Starting Price: " + product.price;
       card.appendChild(price);
 
-      currentBid = document.createElement("p");
-  currentBid.classList.add("current-bid");
-  currentBid.textContent = "Current Bid: " + (currentBidData ? currentBidData : "No bid placed yet");
-  card.appendChild(currentBid);
+      const currentBid = document.createElement("p");
+      currentBid.classList.add("current-bid");
+      currentBid.textContent = "Current Bid: " + (currentBidData ? currentBidData : "No bid placed yet");
+      card.appendChild(currentBid);
 
       const bidInput = document.createElement("input");
       bidInput.classList.add("bid-input");
@@ -231,45 +238,17 @@ function displayProductDetails(product, productId, currentBidData) {
       card.appendChild(bidInput);
 
       const bidButton = document.createElement("button");
-bidButton.classList.add("bid-button");
-bidButton.textContent = "Place Bid";
-bidButton.addEventListener("click", () => {
-    const newBid = bidInput.value;
-    if (newBid > currentBidData) { // Compare with the current bid fetched from the database
-      saveBid(productId, newBid);
-    } else {
-      alert("Please enter a higher bid amount.");
-    }
-  });
-card.appendChild(bidButton);
-
-
-
-
-      function saveBid(productId, currentBid) {
-        // Create the bid object with the productId and currentBid
-        const bid = {
-          productId: productId,
-          currentBid: currentBid
-        };
-        fetch('http://localhost:3000/bids', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(bid)
-        })
-        .then(response => {
-          if (response.ok) {
-            alert('Bid placed successfully!');
-          } else {
-            console.error('Error saving bid:', response.status);
-          }
-        })
-        .catch(error => {
-          console.error('Error saving bid:', error);
-        });
-      }
+      bidButton.classList.add("bid-button");
+      bidButton.textContent = "Place Bid";
+      bidButton.addEventListener("click", () => {
+        const newBid = bidInput.value;
+        if (newBid > currentBidData) {
+          saveBid(productId, newBid);
+        } else {
+          alert("Please enter a higher bid amount.");
+        }
+      });
+      card.appendChild(bidButton);
 
       const bidsContainer = document.createElement("div");
       bidsContainer.classList.add("bids-container");
@@ -290,11 +269,8 @@ card.appendChild(bidButton);
       productContainer.appendChild(timerDisplay);
 
       // Start the timer
-   
       startTimer(duration, timerDisplay);
-
     }
-
 
     // Function to format time in hh:mm:ss format
     function formatTime(duration) {
@@ -309,11 +285,7 @@ card.appendChild(bidButton);
       return hours + ":" + minutes + ":" + seconds;
     }
 
-
-
-
     fetchProductDetails();
   </script>
-
 </body>
 </html>
