@@ -101,10 +101,17 @@ app.use(cors(
 app.use(express.json());
 app.use(express.static(__dirname + '/forgotpass')); 
 app.use(express.urlencoded({ extended: true }));
-// Create a route for handling the signup form submission
-app.post('/signup', (req, res) => {
+// // Start the server
+app.listen(3000, () => {
+  console.log('Server started on port 3000');
+});
+
+
+
+//EMAIL FOR SIGNUP
+app.post('/signup', async (req, res) => {
   // Extract the form data from the request
-  const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
+   const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
   const bankDetails = {
     accountNumber,
     ifscCode,
@@ -119,7 +126,7 @@ app.post('/signup', (req, res) => {
     city,
   }
   // Create a new user instance
-  const newUser = new User({
+ try{ const newUser = new User({
     username,
     password,
     email,
@@ -131,24 +138,41 @@ app.post('/signup', (req, res) => {
     bankDetails,
   });
 
-  console.log(newUser);
+    // Save the user to the database
+    await newUser.save();
 
+    // Send registration email to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
 
-   //Save the user to the database
-  User.create(newUser)
-   .then(() => {
-    res.send('User created successfully');
-  })
- .catch((error) => {
-     console.error('Error creating user:', error);
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: email,
+      subject: 'Welcome to Our Website',
+      text: 'Thank you for registering on our website!',
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: error });
+      } else {
+        console.log('Email sent:', info.response);
+        res.status(200).json({ message: 'User created successfully. Registration email sent.' });
+      }
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
     res.status(500).json({ error: 'Error creating user' });
-   });
+  }
 });
 
-// Start the server
-app.listen(3000, () => {
-  console.log('Server started on port 3000');
-});
+
 
 
 
@@ -173,40 +197,6 @@ app.post('/login', async (req, res) => {
 });
 
 
-
-// //UPDATE PROFILE
-
-
-// app.use(bodyParser.json());
-
-// // Serve static files (HTML, CSS, images)
-// app.use(express.static('public'));
-
-// // Route to handle the update profile request
-// app.post('/update-profile', (req, res) => {
-//   const formData = req.body;
-
-//   // Find the user in the database and update their details
-//   User.findOneAndUpdate({}, formData, { new: true })
-//     .then(updatedUser => {
-//       if (updatedUser) {
-//         console.log('User details updated:', updatedUser);
-//         res.json({ message: 'User details updated successfully' });
-//       } else {
-//         console.log('User not found');
-//         res.status(404).json({ message: 'User not found' });
-//       }
-//     })
-//     .catch(error => {
-//       console.error('Error updating user details:', error);
-//       res.status(500).json({ message: 'Error updating user details' });
-//     });
-// });
-
-// // Start the server
-// app.listen(port, () => {
-//   console.log(`Server running on http://localhost:${port}`);
-// });
 
 
 //LOGIN 
@@ -339,10 +329,84 @@ app.post('/forgor-password', async (req, res) => {
   })
 
 
+//ADMIN 
+
+app.get('/admin2/users', (req, res) => {
+    
+  User.find({}, 'firstName email username')
+    .exec()
+    .then((users) => {
+      res.json(users);
+    })
+    .catch((error) => {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
 
 
-  // Send the email
- 
+// Serve the admin.html page
+app.get('/admin2', (req, res) => {
+res.sendFile(path.join(__dirname, 'admin2.html'));
+});
 
 
+
+// Route for deleting a user
+app.delete('/admin2/users/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Find the user by ID and remove it from the database
+    const user = await User.findByIdAndRemove(id).select('email');
+
+    // Send email notification to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: user.email, // Change this to the admin's email address
+      subject: 'User Deleted',
+      text: 'A user has been deleted by the admin.',
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
+app.post("/admin2/users/:id/block", async (req, res) => {
+const id = req.params.id;
+
+try {
+  // Find the user by ID and update their blocked status
+  const user = await User.findByIdAndUpdate(
+    id,
+    { $set: { blocked: true, blockedUntil: Date.now() + 7 * 24 * 60 * 60 * 1000 } },
+    { new: true }
+  );
+
+  res.status(200).json({ message: "User blocked successfully", user });
+} catch (error) {
+  console.error("Error blocking user:", error);
+  res.status(500).json({ error: "An error occurred" });
+}
+});
 
