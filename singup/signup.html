@@ -124,23 +124,7 @@
                         <a href="/T&C.pdf">I Agree To The Terms And Conditions</a>
                     </div>
                     
-                    <!-- <div class="captcha">
-                        <div class="spinner">
-                            <label>
-                                <input type="checkbox" onclick=getCheckboxValue()>
-                                <span class="checkmark"><span>&nbsp;</span></span>
-                            </label>
-                        </div>
-                        <div class="text">
-                            I'm not a robot
-                        </div>
-                        <div class="logo">
-                            
-                            <p>reCAPTCHA</p>
-                            <small>Privacy - Terms</small>
-                        </div>
-
-                    </div> -->
+                
                     <div class="butto">
                         <button type="submit">SUBMIT</button>
                     </div>
@@ -204,7 +188,13 @@ frm.addEventListener("submit", function (event) {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log("Response from server:", data);
+      if(data=='Email already exists')
+      {
+        alert("Email already exists ")
+      }
+      else{
+        alert("Account created")
+      }
       // Handle the response from the server
     })
     .catch((error) => {
