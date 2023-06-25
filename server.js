@@ -8,6 +8,18 @@ const app = express();
 const port = 8000;
 const bodyParser = require('body-parser');
 const async = require('hbs/lib/async');
+
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+const session = require('express-session');
+
+app.use(session({
+  secret: 'dony1234',
+  resave: false,
+  saveUninitialized: false
+}));
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net/esell2024', { useNewUrlParser: true, useUnifiedTopology: true,family:4 })
   .then(() => {
@@ -300,11 +312,14 @@ app.post('/forgor-password', async (req, res) => {
 
  var user = await User.findOne({ email });
  console.log(user);
+ 
     if (user) {
+      req.session.email = email;
       console.log(email);
       console.log(user.email);
       // Compare the provided password with the stored hashed password
       var match = email === user.email;
+      
         console.log(match);
           if (match) {
             transporter.sendMail(mailOptions, (error, info) => {
@@ -325,6 +340,7 @@ app.post('/forgor-password', async (req, res) => {
       // User not found
       res.status(404).json({ message: 'User not found' });
     }
+    
   })
 
 
@@ -407,4 +423,32 @@ try {
   console.error("Error blocking user:", error);
   res.status(500).json({ error: "An error occurred" });
 }
+});
+
+
+
+//NEW PASS LINK
+app.post('/link', async (req, res) => {
+  const { newPassword } = req.body;
+  const forgotmail=req.header('forgotmail')
+  console.log(forgotmail);
+
+  try {
+
+    const user = await User.findOne({ email:forgotmail });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+
+    // Update the user's password
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ error: 'An error occurred while resetting the password' });
+  }
 });
