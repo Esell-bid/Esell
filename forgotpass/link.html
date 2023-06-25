@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>New Password</title>
+  <style>
+    body {
+    
+      background-repeat: no-repeat;
+      background-size: 1535px 753px;
+    }
+    
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 40px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 53px;
+      margin-left: 535px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="password"] {
+      width: 94%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      display: block;
+      width: 99.2%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .logo {
+      padding-left: 0px;
+      padding-top: 0px;
+      width: 140px;
+      height: 18vh;
+    }
+  </style>
+</head>
+<body>
+  <img src="logoblack.png" class="logo">
+  <div class="container">
+    <h2>Create New Password</h2>
+    <form id="reset-password-form">
+      <label for="newPassword">New Password:</label>
+      <input type="password" id="newPassword" name="newPassword" required>
+      <label for="confirmPassword">Confirm Password:</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required>
+      <button type="submit">Reset Password</button>
+    </form>
+  </div>
+  <script>
+    // Function to show the pop-up message
+    function showPopupMessage(message) {
+      alert(message);
+    }
+
+    // Event handler for the form submission
+    document.getElementById('reset-password-form').addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent the default form submission
+
+      // Extract the form data
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // Verify if passwords match
+      if (newPassword !== confirmPassword) {
+        showPopupMessage("Passwords don't match. Please try again.");
+        return;
+      }
+
+
+      fetch('http://localhost:3000/link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'forgotmail':localStorage.getItem('forgotmail')
+        },
+        body: JSON.stringify({ newPassword })
+      })
+      .then(response => response.json())
+      .then(data => {
+        showPopupMessage(data.message);
+        // Redirect to the login page or any other page as needed
+        window.location.href = 'http://127.0.0.1:5500/project/login/login.html';
+      })
+      .catch(error => {
+        showPopupMessage('An error occurred. Please try again later.');
+      });
+    });
+  </script>
+</body>
+</html>
