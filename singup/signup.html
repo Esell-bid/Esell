@@ -186,17 +186,23 @@ frm.addEventListener("submit", function (event) {
     },
     body: JSON.stringify(formData),
   })
+  
     .then((response) => response.json())
     .then((data) => {
       if(data=='Email already exists')
       {
         alert("Email already exists ")
       }
+      else if(data=='username already exists')
+      {
+        alert("username already exists")
+      }
       else{
         alert("Account created")
       }
       // Handle the response from the server
     })
+    
     .catch((error) => {
       console.error("Error:", error);
       // Handle the error

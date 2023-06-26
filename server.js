@@ -1,40 +1,40 @@
+//SING UP FORM
+const bcrypt = require('bcrypt');
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
 const nodemailer = require('nodemailer');
-
-
+const cors =require('cors');
 const app = express();
-const port = 3000;
+const port = 8000;
+const bodyParser = require('body-parser');
+const async = require('hbs/lib/async');
 
-// Cloudinary configuration
-cloudinary.config({
-  cloud_name: "djrhsrorn",
-  api_key: "449643457296112",
-  api_secret: "QD0dFwLZ8QbI7aXgx_e8ClbbzOw"
-});
 
-// Connection URL and database name
-const url = 'mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net';
-const dbName = 'esell2024'; // Replace with your actual database name
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
+const session = require('express-session');
+
+app.use(session({
+  secret: 'dony1234',
+  resave: false,
+  saveUninitialized: false
+}));
 // Connect to MongoDB
-mongoose.connect(`${url}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net/esell2024', { useNewUrlParser: true, useUnifiedTopology: true,family:4 })
   .then(() => {
-    console.log('Connected to MongoDB successfully');
+    console.log('Connected to MongoDB');
   })
   .catch((error) => {
     console.error('Error connecting to MongoDB:', error);
   });
+
 // Define a schema for the user collection
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true
+    required: true,
+    // unique:true
   },
   password: {
     type: String,
@@ -99,13 +99,8 @@ const userSchema = new mongoose.Schema({
     }
   }
 });
-
-
 // Create a user model based on the schema
 const User = mongoose.model('User', userSchema);
-
-
-
 app.use(cors(
   {
     origin: '*'
@@ -114,51 +109,103 @@ app.use(cors(
 app.use(express.json());
 app.use(express.static(__dirname + '/forgotpass')); 
 app.use(express.urlencoded({ extended: true }));
-// Create a route for handling the signup form submission
-app.post('/signup', (req, res) => {
-  // Extract the form data from the request
-  const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
-  const bankDetails = {
-    accountNumber,
-    ifscCode,
-    upiId
-  }
-  const address = {
-    streetAddress1: addressLine1,
-    streetAddress2: addressLine2,
-    country: Country,
-    state,
-    pincode,
-    city,
-  }
-  // Create a new user instance
-  const newUser = new User({
-    username,
-    password,
-    email,
-    phoneNumber: phonenumber,
-    firstName: firstname,
-    lastName: lastname,
-    isDisabled,
-    address,
-    bankDetails,
-  });
-
-  console.log(newUser);
-
-
-   //Save the user to the database
-  User.create(newUser)
-   .then(() => {
-    res.send('User created successfully');
-  })
- .catch((error) => {
-     console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Error creating user' });
-   });
+// // Start the server
+app.listen(3000, () => {
+  console.log('Server started on port 3000');
 });
 
 
+
+//EMAIL FOR SIGNUP
+// EMAIL FOR SIGNUP
+app.post('/signup', async (req, res) => {
+  try {
+    // Extract the form data from the request
+    const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
+
+      // Check if the username already exists in the database
+      // const existingUsername = await User.findOne({ username });
+      // if (existingUsername) {
+      //   return res.status(400).json('Username already exists');
+      // }
+
+    // Check if the email already exists in the database
+
+    const existingUser = await User.findOne({ email});
+    const existingUsername = await User.findOne({ username});
+
+    if (existingUser) {
+      res.json('Email already exists')
+      return res.status(400);
+    }
+   else  if (existingUsername) {
+      res.json('username already exists')
+      return res.status(400);
+    }
+    else{
+
+    const bankDetails = {
+      accountNumber,
+      ifscCode,
+      upiId
+    }
+    const address = {
+      streetAddress1: addressLine1,
+      streetAddress2: addressLine2,
+      country: Country,
+      state,
+      pincode,
+      city,
+    }
+
+    // Create a new user instance
+    const newUser = new User({
+      username,
+      password,
+      email,
+      phoneNumber: phonenumber,
+      firstName: firstname,
+      lastName: lastname,
+      isDisabled,
+      address,
+      bankDetails,
+    });
+
+    // Save the user to the database
+    await newUser.save();
+    res.json('success')
+  }
+
+    // Send registration email to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: email,
+      subject: 'Welcome to Our Website',
+      text: 'Thank you for registering on our website!',
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: error });
+      } else {
+        console.log('Email sent:', info.response);
+        res.status(200).json({ message: 'User created successfully. Registration email sent.' });
+      }
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Error creating user' });
+  }
+});
 
 
 
@@ -166,13 +213,12 @@ app.post('/signup', (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-console.log('hai');
+
   try {
     const user = await User.findOne({ username, password });
-    console.log(user);
     if (user) {
       // Successful login
-      res.json({ message: 'Login successful',user });
+      res.json({ message: 'Login successful' });
     } else {
       // Invalid credentials
       res.status(401).json({ error: 'Invalid username or password' });
@@ -182,269 +228,246 @@ console.log('hai');
     res.status(500).json({ error: 'Server error' });
   }
 });
-// Define a schema for the product
-const productSchema = new mongoose.Schema({
-  name: String,
-  category: String,
-  description: String,
-  quantity: Number,
-  price: Number,
-  currentBid: Number,
-  date: Date,
-  email: String,
-  images: [String], // Store an array of image URLs
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
+
+
+
+
+//LOGIN 
+
+
+// Middleware to parse JSON data
+app.use(express.json());
+
+// Serve static files (HTML, CSS, images)
+app.use(express.static('public'));
+
+// Route to handle user login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Find the user in the database
+  User.findOne({ username })
+    .then(user => {
+      if (user) {
+        // Compare the provided password with the stored hashed password
+        bcrypt.compare(password, user.password)
+          .then(match => {
+            if (match) {
+              // Passwords match, user is authenticated
+              res.json({ message: 'Login successful' });
+            } else {
+              // Passwords don't match, authentication failed
+              res.status(401).json({ message: 'Invalid username or password' });
+            }
+          });
+      } else {
+        // User not found
+        res.status(404).json({ message: 'User not found' });
+      }
+    })
+    .catch(error => {
+      console.error('Error finding user:', error);
+      res.status(500).json({ message: 'Error finding user' });
+    });
 });
 
-// Define a model for the product using the schema
-const Product = mongoose.model('Product', productSchema);
+//PROFILE UPDATE
 
-// Middleware
+// Route to handle the update profile request
+
+
+// Use body-parser middleware to parse request bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
 
-// Multer storage configuration for Cloudinary
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'products',
-    allowed_formats: ['jpg', 'jpeg', 'png']
+// Set up routes
+app.post('/update-profile', (req, res) => {
+  // Get the form data from the request body
+  const { phoneNumber, addressLine1, addressLine2, city, state, pincode, accountNumber, ifscCode, upiId } = req.body;
+
+  // Find the user by their unique identifier (e.g., user ID) and update their profile
+  User.findOneAndUpdate(
+    {username: 'llllllll' }, // Replace 'USER_ID' with the actual user's ID
+    { phoneNumber, addressLine1, addressLine2, city, state, pincode, accountNumber, ifscCode, upiId },
+    { new: true } // Return the updated document
+  )
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      return res.json({ message: 'Profile updated successfully', user: updatedUser });
+    })
+    .catch((error) => {
+      console.error('Error updating profile:', error);
+      return res.status(500).json({ message: 'Failed to update profile' });
+    });
+});
+
+//forgot password
+
+app.post('/forgor-password', async (req, res) => {
+  const { email } = req.body;
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'esellbid@gmail.com',
+      pass: 'xydtsjpmirtyjkwo',
+    },
+  });
+
+  const mailOptions = {
+    from: 'esellbid@gmail.com',
+    to: email,
+    subject: 'Forgot Password',
+    text: ' To reset password click this link \n http://127.0.0.1:5500/project/forgotpass/link.html',
+  };
+
+  // Create reusable transporter object using the default SMTP transport
+
+ var user = await User.findOne({ email });
+ console.log(user);
+ 
+    if (user) {
+      req.session.email = email;
+      console.log(email);
+      console.log(user.email);
+      // Compare the provided password with the stored hashed password
+      var match = email === user.email;
+      
+        console.log(match);
+          if (match) {
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.error(error)
+                res.status(500).json({ error: error });
+              } else {
+                console.log('Email sent:', info.response);
+                res.status(200).json({ message: 'Password reset email sent successfully' });
+              }
+            });
+            // Passwords match, user is authenticated
+          } else {
+            // Passwords don't match, authentication failed
+            res.status(401).json({ message: 'Email not registered' });
+          }
+    } else {
+      // User not found
+      res.status(404).json({ message: 'User not found' });
+    }
+    
+  })
+
+
+//ADMIN CONFIRMATION
+
+app.get('/admin2/users', (req, res) => {
+    
+  User.find({}, 'firstName email username')
+    .exec()
+    .then((users) => {
+      res.json(users);
+    })
+    .catch((error) => {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+
+// Serve the admin.html page
+app.get('/admin2', (req, res) => {
+res.sendFile(path.join(__dirname, 'admin2.html'));
+});
+
+
+
+// Route for deleting a user
+app.delete('/admin2/users/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Find the user by ID and remove it from the database
+    const user = await User.findByIdAndRemove(id).select('email');
+
+    // Send email notification to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: user.email, // Change this to the admin's email address
+      subject: 'User Deleted',
+      text: 'A user has been deleted by the admin.',
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'An error occurred' });
   }
 });
 
-// Multer upload instance
-const upload = multer({ storage: storage });
 
-// ...
+app.post("/admin2/users/:id/block", async (req, res) => {
+const id = req.params.id;
 
-// Define the route for form submission
-app.post('/submit-form', upload.array('images', 5), async (req, res) => {
-  // Get the form data from the request body
-  const { name, category, description, quantity, price, currentBid, date, email } = req.body;
-  const images = req.files.map(file => file.path); // Store an array of Cloudinary URL paths
+try {
+  // Find the user by ID and update their blocked status
+  const user = await User.findByIdAndUpdate(
+    id,
+    { $set: { blocked: true, blockedUntil: Date.now() + 7 * 24 * 60 * 60 * 1000 } },
+    { new: true }
+  );
+
+  res.status(200).json({ message: "User blocked successfully", user });
+} catch (error) {
+  console.error("Error blocking user:", error);
+  res.status(500).json({ error: "An error occurred" });
+}
+});
+
+
+
+//NEW PASS LINK
+app.post('/link', async (req, res) => {
+  const { newPassword } = req.body;
+  const forgotmail=req.header('forgotmail')
+  console.log(forgotmail);
 
   try {
-    // Find the user in the MongoDB collection based on the email
-    const user = await User.findOne({ email });
+
+    const user = await User.findOne({ email:forgotmail });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+    
 
-    // Create a new product instance
-    const product = new Product({
-      name,
-      category,
-      description,
-      quantity,
-      price,
-      currentBid,
-      date,
-      email,
-      images,
-      user: user._id // Assign the user ID to the product
-    });
+    // Update the user's password
+    user.password = newPassword;
+    await user.save();
 
-    // Save the product to the database
-    product.save()
-      .then(() => {
-        console.log('Product saved successfully');
-        res.sendStatus(200);
-      })
-      .catch((error) => {
-        console.error('Error saving product:', error);
-        res.status(500).send('Error saving product to the database');
-      });
+    res.json({ message: 'Password reset successfully' });
   } catch (error) {
-    console.error('Error fetching user details:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error resetting password:', error);
+    res.status(500).json({ error: 'An error occurred while resetting the password' });
   }
 });
 
 
 
-////////////////////--display pro---////////////////////////////////////
-// Set up route to retrieve product details
-// Set up route to retrieve product details
-app.get('/acceptedproducts', async (req, res) => {
-  try {
-    const acceptedproducts = await Product.find().exec();
-    res.json(acceptedproducts);
-  } catch (error) {
-    console.error('Error retrieving product details from MongoDB:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-// Fetch a single product by ID
-app.get('/acceptedproducts/:id', async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const product = await Product.findById(productId);
+//REPORT
 
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).json({ error: 'Product not found' });
-    }
-  } catch (error) {
-    console.error('Error fetching product details:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-/////////// pro details display///////////////////
-
-// Set the view engine to EJS
-app.set('view engine', 'ejs');
-
-// Define the route for generating multiple pages
-app.get('/generate-pages', async (req, res) => {
-  try {
-    const acceptedproducts    = await Product.find();
-    const renderedPages = [];
-
-    acceptedproducts.forEach(product => {
-      const renderedPage = res.render('product-details', { product });
-      renderedPages.push(renderedPage);
-    });
-
-    res.send(renderedPages.join('')); // Combine and send the rendered pages
-  } catch (error) {
-    console.error('Error fetching product data:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-const bidSchema = new mongoose.Schema({
-  productId: {
-    type: String,
-    required: true
-  },
-  currentBid: {
-    type: Number,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true
-  }
-});
-
-// Create the Bid model
-const Bid = mongoose.model('Bid', bidSchema);
-
-// POST /bids route handler
-app.post('/bids', (req, res) => {
-  const { productId, currentBid, email } = req.body;
-
-  // Create a new Bid instance
-  const bid = new Bid({ productId, currentBid, email });
-
-  // Save the bid to the database
-  bid.save()
-    .then(() => {
-      res.sendStatus(200);
-    })
-    .catch((err) => {
-      console.error('Error saving bid:', err);
-      res.status(500).json({ error: 'Error saving bid' });
-    });
-});
-
-app.get('/bids/:productId', (req, res) => {
-  const productId = req.params.productId;
-
-  // POST /bids route handler
-app.post('/bids', async (req, res) => {
-  const { productId, currentBid, email } = req.body;
-
-  try {
-    // Create a new Bid instance
-    const bid = new Bid({ productId, currentBid, email });
-
-    // Save the bid to the database
-    await bid.save();
-
-    // Find the highest bid for the product
-    const highestBid = await Bid.findOne({ productId }).sort({ currentBid: -1 }).exec();
-
-    // If the current bid is the highest, send an email to the bidder
-    if (highestBid && highestBid.email === email) {
-      const transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-          user: 'esellbid@gmail.com',
-          pass: 'xydtsjpmirtyjkwo',
-        },
-      });
-
-      const mailOptions = {
-        from: 'esellbid@gmail.com',
-        to: email,
-        subject: 'Congratulations! You Won the Bid',
-        text: 'Congratulations! You have won the bid for the product.',
-      };
-
-      await transporter.sendMail(mailOptions);
-    }
-
-    res.sendStatus(200);
-  } catch (error) {
-    console.error('Error saving bid:', error);
-    res.status(500).json({ error: 'Error saving bid' });
-  }
-});
-
-
-  // Find the latest bid for the given product
-  Bid.findOne({ productId })
-    .sort({ currentBid: -1 }) // Sort in descending order of currentBid
-    .exec()
-    .then((bid) => {
-      if (bid) {
-        res.status(200).json({ currentBid: bid.currentBid });
-      } else {
-        res.status(404).json({ error: 'No bid found for the product' });
-      }
-    })
-    .catch((err) => {
-      console.error('Error fetching current bid:', err);
-      res.status(500).json({ error: 'Error fetching current bid' });
-    });
-});
-const winnerSchema = new mongoose.Schema({
-  email: String,
-  currentBid: Number,
-  productId: String
-});
-
-const Winner = mongoose.model('Winner', winnerSchema);
-
-// Handle POST request to save winner
-app.post('/winners', (req, res) => {
-  const { email, currentBid, productId } = req.body;
-
-  const winner = new Winner({
-    email: email,
-    currentBid: currentBid,
-    productId: productId
-  });
-
-  winner.save((err, savedWinner) => {
-    if (err) {
-      console.error('Error saving winner:', err);
-      res.status(500).send('Error saving winner');
-    } else {
-      res.status(200).send('Winner saved successfully');
-    }
-  });
-});
