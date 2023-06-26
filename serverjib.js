@@ -4,6 +4,9 @@ const cors = require('cors');
 const path = require('path')
 const methodOverride = require("method-override");
 const { Console } = require('console');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
 
 // Create the Express app
 const app = express();
@@ -24,6 +27,12 @@ app.use(express.json());
 // Serve static files from the "public" directory
 app.use(express.static('public'));
 
+
+cloudinary.config({
+  cloud_name: "djrhsrorn",
+  api_key: "449643457296112",
+  api_secret: "QD0dFwLZ8QbI7aXgx_e8ClbbzOw"
+});
 
 // Connect to MongoDB
 const CONNECT_URL = "mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net/esell2024?retryWrites=true&w=majority" 
@@ -63,6 +72,9 @@ const userSchema = new mongoose.Schema({
   firstName: String,
   email: String,
   username: String,
+  isDisabled: String,
+  phoneNumber: String,
+  password: String,
 });
 
 // Define a Product schema
@@ -71,6 +83,16 @@ const productSchema = new mongoose.Schema({
   category: String,
   id: String,
   description: String,
+  quantity: Number,
+  price: Number,
+  currentBid: Number,
+  date: Date,
+  email: String,
+  images: [String], // Store an array of image URLs
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 
@@ -79,14 +101,26 @@ const acceptedProductSchema = new mongoose.Schema({
   name: String,
   category: String,
   description: String,
-  quantity: String,
-  price: String,
-  currentbid: String,
+  quantity: Number,
+  price: Number,
+  currentbid: Number,
   date: Date,
-  
-  
+  email: String,
+  images: [String],
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
   // id: String,
   // Add more fields as needed
+});
+
+// Define a schema for the "reports" collection
+const reportSchema = new mongoose.Schema({
+  username: String,
+  reason: String,
+  otherReason: String,
+  detailedDescription: String,
 });
 
 const productApprovalSchema = new mongoose.Schema({
@@ -94,6 +128,11 @@ const productApprovalSchema = new mongoose.Schema({
   name: { type: String, required: true },
   category: { type: String, required: true },
   description: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
+  currentbid: { type: Number, required: true },
+  email: { type: String, required: true },
+  images: { type: [String], required: true },
   // Add any other fields relevant to product approval
 });
 
@@ -103,7 +142,7 @@ const User = mongoose.model('User', userSchema, userCollectionName);
 const Product = mongoose.model('Products', productSchema, productsName);
 const AcceptedProduct = mongoose.model('AcceptedProduct', acceptedProductSchema);
 const ProductApproval = mongoose.model('ProductApproval', productApprovalSchema);
-
+const Report = mongoose.model('Reports', reportSchema);
 
 
 // Handle form submission
@@ -227,7 +266,7 @@ app.get('/offlinebidd', async (req, res) => {
   
   app.get('/admin2/users', (req, res) => {
     
-    User.find({}, 'firstName email username')
+    User.find({}, 'firstName email username isDisabled phoneNumber password')
       .exec()
       .then((users) => {
         res.json(users);
@@ -305,23 +344,25 @@ app.get('/product-approval/products', async(req, res) => {
     });
 });
 
-// app.get('/product-approval/products', (req, res) => {   
-//   User.find({}, 'name category')
-//     .exec()
-//     .then((products) => {
-//       res.json(products);
-//     })
-//     .catch((error) => {
-//       console.error('Error fetching users:', error);
-//       res.status(500).json({ error: 'Internal server error' });
-//     });
-// });
+
 
 app.get('/product-approval', (req, res) => {
   res.sendFile(path.join(__dirname, 'product-approval.html'));
 });
 
 
+
+// Multer storage configuration for Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'products',
+    allowed_formats: ['jpg', 'jpeg', 'png']
+  }
+});
+
+// Multer upload instance
+const upload = multer({ storage: storage });
 
 
 // Route to handle the POST request and save the accepted product
@@ -340,8 +381,8 @@ console.log('hi')
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    console.log(product.name)
-    const { name, category, description, quantity, price, currentbid, date, time } = product;
+    console.log(product.images)
+    const { name, category, description, quantity, price, currentbid,images, date, time, email } = product;
 
     // Create a new accepted product based on the found product
     const acceptedProduct = new AcceptedProduct({
@@ -353,6 +394,9 @@ console.log('hi')
       currentbid,
       date,
       time,
+      email,
+      images,
+      user: User._id,
       // Add other fields as needed
     });
 
@@ -370,6 +414,20 @@ console.log('hi')
 
 
 
+// Define a route to handle the request for the "reportviews" page
+app.get('/reportview/reports', (req, res) => {
+  // Fetch all reports from the MongoDB collection
+  Report.find({})
+    .exec()
+    .then((reports) => {
+      res.json(reports);
+    })
+    .catch(error => {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  });
+  
+});
 
 
 
