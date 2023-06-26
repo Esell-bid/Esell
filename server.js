@@ -470,4 +470,72 @@ app.post('/link', async (req, res) => {
 
 
 //REPORT
+const reportSchema = new mongoose.Schema({
+  username: String,
+  reason: String,
+  otherReason: String,
+  detailedDescription: String,
+});
+const Report = mongoose.model('Report', reportSchema);
 
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'esellbid@gmail.com',
+    pass: 'xydtsjpmirtyjkwo',
+  },
+});
+
+app.post('/reports', function (req, res) {
+  // Get the form data from the request body
+  const { username, reason, enterreason, detaileddescr } = req.body;
+
+  // Create a new report instance
+  const report = new Report({
+    username,
+    reason,
+    otherReason: enterreason,
+    detailedDescription: detaileddescr,
+  });
+
+  // Save the report to the database
+  report.save()
+    .then(() => {
+      console.log('Report saved successfully');
+
+      // Find the user with the reported username
+      User.findOne({ username: username })
+        .then((user) => {
+          if (user) {
+            const userEmail = user.email;
+
+            // Send email notification to the reported user's email address
+            const mailOptions = {
+              from: 'esellbid@gmail.com',
+              to: userEmail,
+              subject: 'You have been reported',
+              text: 'You have been reported on our website. Please review your activities and adhere to our policies.',
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.error('Error sending email:', error);
+              } else {
+                console.log('Email sent:', info.response);
+              }
+            });
+          } else {
+            console.log('User not found with the reported username');
+          }
+        })
+        .catch((error) => {
+          console.error('Error finding user:', error);
+        });
+
+      res.sendStatus(200);
+    })
+    .catch((error) => {
+      console.error('Error saving report:', error);
+      res.status(500).send('Error saving report to the database');
+    });
+});
