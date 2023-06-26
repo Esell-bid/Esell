@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product Approval Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #666;
+      color: #fff;
+      padding: 10px;
+    }
+
+    nav ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 10;
+      overflow: hidden;
+    }
+
+    nav ul li {
+      display: inline;
+      margin-right: 10px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    table {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn.accept {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .btn.reject {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .btn.accept:hover,
+    .btn.reject:hover {
+      background-color: #45a049;
+    }
+
+    .btn.accept:focus,
+    .btn.reject:focus {
+      outline: none;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    
+  </style>
+</head>
+<body>
+  <h2>Product Approval Page</h2>
+
+  <nav>
+    <ul>
+      <!-- <li><a href="admin-dashboard.html">Dashboard</a></li> -->
+      <!-- <li><a href="user-list.html">Users</a></li> -->
+      <li><a href="admin2.html">Main Page</a></li>
+      <!-- <li><a href="settings.html">Settings</a></li> -->
+      <li><a href="reportview.html">Reports</a></li>
+    </ul>
+  </nav>
+
+  <table id="product-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>id</th>
+        <th>description</th>
+        <th>quantity</th>
+        <th>price</th>
+        <!-- <th>currentbid</th> -->
+        <th>date</th>
+        <th>email</th>
+        <!-- <th>images</th> -->
+        <th>Actions</th>
+        
+      </tr>
+    </thead>
+    <tbody id="product-body"></tbody>
+    
+    
+  </table>
+
+  <script  src="product-approval.js"></script>
+</body>
+</html>
