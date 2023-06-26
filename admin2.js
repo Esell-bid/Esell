@@ -1,4 +1,4 @@
-fetch('http://localhost:3000/admin2/users')
+fetch('http://localhost:8080/admin2/users')
   .then(response => response.json())
   .then(users => {
     const userTableBody = document.querySelector('#userTable ');
@@ -9,6 +9,9 @@ fetch('http://localhost:3000/admin2/users')
         <td>${user.firstName}</td>
         <td>${user.email}</td>
         <td>${user.username}</td>
+        <td>${user.isDisabled}</td>
+        <td>${user.phoneNumber}</td>
+        <td>${user.password}</td>
         <td>
             <button onclick="deleteUser('${user._id}')">Delete</button>
             <button class="block-btn" data-user-id="${user._id}">Block</button>
@@ -38,7 +41,7 @@ function blockUser() {
 
 
 function deleteUser(id) {
-    fetch(`http://localhost:3000/admin2/users/${id}`, {
+    fetch(`http://localhost:8080/admin2/users/${id}`, {
       method: 'DELETE',
     })
       .then(response => {
@@ -54,7 +57,32 @@ function deleteUser(id) {
       });
   }
 
+  // document.addEventListener("DOMContentLoaded", function () {
+  //   // Retrieve the table and attach a click event listener to it
+  //   const userTable = document.getElementById("userTable");
+  //   userTable.addEventListener("click", handleTableClick);
   
+  //   function handleTableClick(event) {
+  //     // Check if the clicked element is the "Block" button
+  //     if (event.target.classList.contains("block-btn")) {
+  //       const row = event.target.parentNode.parentNode; // Get the parent row of the clicked button
+  //       const userId = row.getAttribute("data-user-id"); // Retrieve the user ID from the row's attribute
+  
+  //       // Send a POST request to the server to block the user
+  //       fetch(`/admin2/users/${userId}/block`, { method: "POST" })
+  //         .then((response) => response.json())
+  //         .then((data) => {
+  //           console.log(data); // Display the response from the server
+  //           // Handle any UI updates or display success messages
+  //         })
+  //         .catch((error) => {
+  //           console.error("Error blocking user:", error);
+  //           // Handle errors or display error messages
+  //         });
+  //     }
+  //   }
+  // });
+
   // Block user function
 function blockUserRequest(userId) {
   fetch(`/admin2/users/${userId}/block`, {
