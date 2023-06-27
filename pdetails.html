@@ -6,7 +6,6 @@
   <title>Product Details</title>
   <style>
     body {
-      background-image: url('bg2.png');
       background-repeat: no-repeat;
       background-size: 1560px 1085px;
       font-family: Arial, sans-serif;
@@ -26,20 +25,6 @@
       padding: 20px;
     }
 
-    .pic {
-      margin-top: 30px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .product-image {
-      width: 100%;
-      max-height: 250px;
-      object-fit: contain;
-      margin-bottom: 10px;
-    }
-
     h2 {
       font-size: 30px;
       margin-top: 0;
@@ -51,37 +36,136 @@
       margin-top: 0;
       margin-bottom: 10px;
     }
-
+    .price {
+  margin-top: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
     .timer {
       font-size: 24px;
       font-weight: bold;
       margin-top: 20px;
       margin-bottom: 40px;
+      margin-right: 500px;
       color: #333;
     }
-
-    .bid-input {
-      width: 150px;
-      padding: 5px;
-      margin-right: 10px;
-    }
-
     .bid-button {
-      padding: 5px 10px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
+  margin-left:200px;
+  margin-top: -50px;
+  box-shadow: 0px 10px 25px 3px rgba(255, 125, 26, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+}
+.btn-orange {
+  padding: 0.4rem 3rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color:#fff;
+  background-color:chocolate;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+}
+.price-btns {
+  width: 40%;
+  margin-left: 0px;
+  margin-bottom: -40px;
+  padding: 1rem 1rem;
+  border: none;
+  background-color:hsl(223, 64%, 98%);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3.5rem;
+}
+.price-box__main-new {
+  font-size: 3rem;
+  font-weight: 600;
+  padding-left: 0px;
+  width: 500px;
+}
+.img-main {
+  width: 500px;
+  border-radius: 5%;
+  cursor: pointer;
 
-    .bid-button:hover {
-      background-color: #0056b3;
-    }
+  margin-bottom: 3.5rem;
+  box-shadow:0px 10px 25px 3px rgba(0, 0, 0, 0.5);
+}
 
-    .current-bid {
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
+.img-main__btn {
+  display: none;
+}
+
+.img-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  width:50%;
+}
+
+.img-btn {
+  margin-top: -40px;
+  width: 180px;
+    display: block;
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: 10%;
+    transition: all 0.3s;
+    position: relative;
+    height: 172px;
+    float: left;
+    box-shadow:0px 10px 25px 3px rgba(0, 0, 0, 0.5);
+   
+}
+
+.img-btn::after {
+  content: "";
+  max-width: 100%;
+  height: 100%;
+  background-color:#fff;
+  border-radius: 10%;
+  border: 3px solid transparent;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+}
+.item {
+  padding: 0 3rem;
+  max-width: 100%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 0.8fr 1fr;
+  gap: 10rem;
+}
+.img-btn:hover {
+  background-color:chocolate;
+}
+
+.img-btn:hover::after {
+  border: 3px solid chocolate ;
+  opacity: 0.5;
+}
+
+.img-btn__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10%;
+  border: 3px solid transparent;
+  transition: all 0.3s;
+  transform-origin: bottom;
+}
 
     .starting-price {
       margin-bottom: 20px;
@@ -102,7 +186,10 @@
     .bid:nth-child(2n) {
       background-color: #f0f0f0;
     }
-
+    .details{
+      width:50%;
+      margin-top: 100px;
+    }
     .logo {
       width: 140px;
       height: auto;
@@ -110,11 +197,11 @@
   </style>
 </head>
 <body>
-  <div class="container" id="productContainer"></div>
+  <div class="item" id="productContainer"></div>
 
   <script>
     // Function to start the timer
-    function startTimer(duration, display) {
+   function startTimer(duration, display)  {
       let timer = duration, hours, minutes, seconds;
       setInterval(function () {
         hours = parseInt(timer / 3600, 10);
@@ -128,10 +215,16 @@
         display.textContent = hours + ":" + minutes + ":" + seconds;
 
         if (--timer < 0) {
+       
           alert("Bid time has expired. The winner will be notified by email.");
+          console.log('Bid Completed');
         }
       }, 1000);
-    }
+}
+// Function to retrieve the latest email when the timer ends
+
+
+    
 
     async function fetchProductDetails() {
       try {
@@ -189,56 +282,78 @@
 
     function displayProductDetails(product, productId, currentBidData) {
       const productContainer = document.getElementById('productContainer');
-      const card = document.createElement("div");
-      card.classList.add("card");
+    
+      
 
-      const pic = document.createElement("div");
-      pic.classList.add("pic");
-      card.appendChild(pic);
+      const pic = document.createElement("section");
+      pic.classList.add("img");
+     
+      const details = document.createElement("div");
+      details.classList.add("details");
+      
 
       // Iterate over the images array and create img elements within the pic container
-      product.images.forEach((imageUrl) => {
-        const image = document.createElement("img");
-        image.src = imageUrl;
-        image.alt = "Product Image";
-        image.classList.add("product-image");
-        pic.appendChild(image);
-      });
+      if (product.images.length > 0) {
+  var imageUrl = product.images[0]; // Get the first image URL
+  var image = document.createElement("img");
+  image.src = imageUrl;
+  image.alt = "Product Image";
+  image.classList.add("img-main");
+  pic.appendChild(image);
+}
+const bt = document.createElement("div");
+      bt.classList.add("img-btns");
+      
+      for (var i = 0; i < product.images.length; i++) {
+  var imageUrl = product.images[i];
+  var button = document.createElement("button");
+  button.className = "img-btn";
+  var image = document.createElement("img");
+  image.src = imageUrl;
+  image.alt = "Product Image";
+  image.classList.add("img-btn__img");
+  button.appendChild(image);
+  bt.appendChild(button);
+}
 
+      
+      pic.appendChild(bt);
       const title = document.createElement("h2");
       title.textContent = product.name;
-      card.appendChild(title);
+      details.appendChild(title);
 
       const description = document.createElement("p");
       description.textContent = "Description: " + product.description;
-      card.appendChild(description);
+      details.appendChild(description);
 
       const quantity = document.createElement("p");
       quantity.textContent = "Quantity: " + product.quantity;
-      card.appendChild(quantity);
+      details.appendChild(quantity);
 
       const endDate = document.createElement("p");
       endDate.textContent = "End Date: " + product.date;
-      card.appendChild(endDate);
+      details.appendChild(endDate);
 
       const price = document.createElement("p");
       price.classList.add("starting-price");
       price.textContent = "Starting Price: " + product.price;
-      card.appendChild(price);
+      details.appendChild(price);
+      
 
       const currentBid = document.createElement("p");
-      currentBid.classList.add("current-bid");
+      currentBid.classList.add("price-box__main-new");
       currentBid.textContent = "Current Bid: " + (currentBidData ? currentBidData : "No bid placed yet");
-      card.appendChild(currentBid);
+      details.appendChild(currentBid);
 
       const bidInput = document.createElement("input");
-      bidInput.classList.add("bid-input");
+      bidInput.classList.add("price-btns");
       bidInput.type = "number";
       bidInput.placeholder = "Enter your bid";
-      card.appendChild(bidInput);
+      details.appendChild(bidInput);
 
       const bidButton = document.createElement("button");
       bidButton.classList.add("bid-button");
+      bidButton.classList.add("btn-orange");
       bidButton.textContent = "Place Bid";
       bidButton.addEventListener("click", () => {
         const newBid = bidInput.value;
@@ -248,13 +363,14 @@
           alert("Please enter a higher bid amount.");
         }
       });
-      card.appendChild(bidButton);
-
+      details.appendChild(bidButton);
+      
       const bidsContainer = document.createElement("div");
       bidsContainer.classList.add("bids-container");
-      card.appendChild(bidsContainer);
-
-      productContainer.appendChild(card);
+      details.appendChild(bidsContainer);
+      productContainer.appendChild(pic);
+      productContainer.appendChild(details);
+   
 
       // Calculate the remaining time based on the starting time
       const startingTime = new Date(product.date).getTime();
@@ -266,11 +382,35 @@
       const timerDisplay = document.createElement("div");
       timerDisplay.classList.add("timer");
       timerDisplay.textContent = formatTime(duration);
-      productContainer.appendChild(timerDisplay);
+      details.appendChild(timerDisplay);
 
       // Start the timer
       startTimer(duration, timerDisplay);
     }
+    function retrieveLatestEmail() {
+  // Make an HTTP GET request to the server
+  fetch('http://localhost:3000/latest-email')
+    .then(response => response.json())
+    .then(data => {
+      if (data.email) {
+        const latestEmail = data.email;
+        // Save the latest email to the winners collection or perform any other necessary actions
+        // ...
+        console.log('Latest email:', latestEmail);
+      } else {
+        console.log('No email found');
+      }
+      console.log('email:', latestEmail);
+    })
+    .catch(error => {
+      console.error('Error retrieving latest email:', error);
+    });
+}
+
+
+// ...
+
+
 
     // Function to format time in hh:mm:ss format
     function formatTime(duration) {
@@ -284,8 +424,10 @@
 
       return hours + ":" + minutes + ":" + seconds;
     }
-
+    
+    retrieveLatestEmail();
     fetchProductDetails();
+    
   </script>
 </body>
 </html>
