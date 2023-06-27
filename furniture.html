@@ -28,23 +28,25 @@
             <img src="/Furniture.jpeg" style="height: 178px;width: 298px;">
         </div>    
     </div>
+    <div class="side">
+      <h2 style="background: none; text-align: center;padding-top: 20px;">SHOP BY CATEGORY</h2>
+      <a href="/furniture.html">FURNITURE</a>
+      <a href="/vehicle.html">VEHICLE</a>
+      <a href="/fashion.html">FASHION</a>
+      <a href="/fruits_vegi.html">FRUITS AND VEGETABLES</a>
+      <a href="/electronics.html">ELECTRONICS</a>
+      <a href="/Artwork.html">ART WORK</a>
+      <a href="/other.html">OTHER</a>
+  </div>
    <div class="bottom">
         <section class="acceptedproducts">
             <div class="all-products" id="productContainer">
                 <!-- Product placeholders -->
             </div>
         </section>
-        <div class="side">
-            <h2 style="background: none; text-align: center;padding-top: 20px;">SHOP BY CATEGORY</h2>
-            <a href="/furniture.html">FURNITURE</a>
-            <a href="/vehicle.html">VEHICLE</a>
-            <a href="/fashion.html">FASHION</a>
-            <a href="/fruits_vegi.html">FRUITS AND VEGETABLES</a>
-            <a href="/electronics.html">ELECTRONICS</a>
-            <a href="/Artwork.html">ART WORK</a>
-            <a href="/other.html">OTHER</a>
-        </div>
     </div>
+   
+
 
     <script>
                 function displayProductDetails(acceptedproducts) {
@@ -58,7 +60,7 @@
       productDiv.classList.add('product');
 
       const productLink = document.createElement("a");
-      productLink.href = `/pdetails.html?id=${product._id}`;
+      productLink.href = `/p.html?id=${product._id}`;
       productLink.appendChild(productDiv);
       productContainer.appendChild(productLink);
 
