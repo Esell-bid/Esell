@@ -8,7 +8,7 @@ document.getElementById('myform').addEventListener('submit', function(event) {
   var price = document.getElementById('price').value;
   var currentBid = document.getElementById('price').value;
   var date = document.getElementById('startDate').value;
-  var time = document.getElementById('startTime').value;
+  var email = localStorage.getItem('userEmail');
   var images = document.getElementById('image').files; // Get the selected image files
 
   var formData = new FormData();
@@ -19,7 +19,7 @@ document.getElementById('myform').addEventListener('submit', function(event) {
   formData.append('price', price);
   formData.append('currentBid', currentBid);
   formData.append('date', date);
-  formData.append('time', time);
+  formData.append('email', email);
 
   // Append each selected image file to the FormData
   for (var i = 0; i < images.length; i++) {
@@ -32,6 +32,7 @@ document.getElementById('myform').addEventListener('submit', function(event) {
   })
   .then(function(response) {
     if (response.ok) {
+      alert("Product submitted successfully and under verification");
       console.log('Form submitted successfully');
       // Reset the form
       document.getElementById('myform').reset();
