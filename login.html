@@ -4,7 +4,7 @@
     <title>login page</title>
     <style>
         body{
-            background-image: url('bg.png');
+            background-image: url('/img/bg.png');
             background-repeat: no-repeat;
             background-size: 1535px 753px;
              }
@@ -105,12 +105,12 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
 
   if (response.ok) {
     // Successful login
-    console.log(data.message);
+    // console.log(data.message);
     user=data.user
     console.log(user);
-    localStorage.setItem('userEmail', user.email);
+    localStorage.setItem('userEmail', data.email);
     // Perform any desired action, such as redirecting to a dashboard page
-    window.location.href = 'http://127.0.0.1:5500/main2.html';
+    window.location.href = '/main2.html';
   } else {
     // Failed login
     console.error(data.error);
