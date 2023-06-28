@@ -1,62 +1,84 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path')
+const methodOverride = require("method-override");
+const { Console } = require('console');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
+const nodemailer = require('nodemailer');
 
-
+// Create the Express app
 const app = express();
-const port = 3000;
 
-// Cloudinary configuration
+app.use(cors(
+    {
+        origin: '*'
+    }
+  ))
+
+  
+  app.use(methodOverride("_method"));
+
+
+  // Parse JSON request bodies
+app.use(express.json());
+
+// Serve static files from the "public" directory
+app.use(express.static('public'));
+
+
 cloudinary.config({
   cloud_name: "djrhsrorn",
   api_key: "449643457296112",
   api_secret: "QD0dFwLZ8QbI7aXgx_e8ClbbzOw"
 });
 
-// Connection URL and database name
-const url = 'mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net';
-const dbName = 'esell2024'; // Replace with your actual database name
-
 // Connect to MongoDB
-mongoose.connect(`${url}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB successfully');
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-  });
-// Define a schema for the user collection
+const CONNECT_URL = "mongodb+srv://jibbinjacob:jibbin2002@cluster0.gq0orgc.mongodb.net/esell2024?retryWrites=true&w=majority" 
+mongoose
+.connect(CONNECT_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+.then((result) => {
+console.log("connected")
+    app.listen(process.env.PORT || 8080);
+})
+.catch((error) => {
+console.log(error);
+});
+
+// const url = 'mongodb://localhost:27017';
+
+// Database and collection names
+const dbName = 'esell2024';
+const formDataCollectionName = 'formdatas';
+const userCollectionName = 'users';
+const productsName= 'products';
+
+// // Create a new MongoClient
+// const client = new MongoClient(CONNECT_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Create a schema for the form data
+const formDataSchema = new mongoose.Schema({
+    place: String,
+    startTime: String,
+    endTime: String,
+    location: String,
+    date: Date,
+    product: String,
+  // Add more fields as needed
+});
+
 const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true
-  },
-  phoneNumber: {
-    type: String,
-    required: true
-  },
-  firstName: {
-    type: String,
-    required: true
-  },
+  firstName: String,
+  email: String,
+  username: String,
+  isDisabled: String,
+  phoneNumber: String,
+  password: String,
   lastName: {
     type: String,
     required: true
-  },
-  isDisabled:{
-    type:Boolean
   },
   address: {
     streetAddress1: {
@@ -99,20 +121,537 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-
-// Create a user model based on the schema
-const User = mongoose.model('User', userSchema);
-
-
-
-app.use(cors(
-  {
-    origin: '*'
+// Define a Product schema
+const productSchema = new mongoose.Schema({
+  name: String,
+  category: String,
+  id: String,
+  description: String,
+  quantity: Number,
+  price: Number,
+  currentBid: Number,
+  date: Date,
+  time: Date,
+  email: String,
+  images: [String], // Store an array of image URLs
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
-))
-app.use(express.json());
-app.use(express.static(__dirname + '/forgotpass')); 
-app.use(express.urlencoded({ extended: true }));
+});
+
+
+// Define a schema for the accepted products
+const acceptedProductSchema = new mongoose.Schema({
+  name: String,
+  category: String,
+  description: String,
+  quantity: Number,
+  price: Number,
+  currentbid: Number,
+  date: Date,
+  email: String,
+  images: [String],
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
+  // id: String,
+  // Add more fields as needed
+});
+
+// Define a schema for the "reports" collection
+const reportSchema = new mongoose.Schema({
+  username: String,
+  reason: String,
+  otherReason: String,
+  detailedDescription: String,
+});
+
+const productApprovalSchema = new mongoose.Schema({
+  // Define the schema fields for product approval
+  name: { type: String, required: true },
+  category: { type: String, required: true },
+  description: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
+  currentbid: { type: Number, required: true },
+  email: { type: String, required: true },
+  images: { type: [String], required: true },
+  // Add any other fields relevant to product approval
+});
+
+// const userSchema2 = new mongoose.Schema({
+//   username: {
+//     type: String,
+//     required: true
+//   },
+//   password: {
+//     type: String,
+//     required: true
+//   },
+//   email: {
+//     type: String,
+//     required: true
+//   },
+//   phoneNumber: {
+//     type: String,
+//     required: true
+//   },
+//   firstName: {
+//     type: String,
+//     required: true
+//   },
+//   lastName: {
+//     type: String,
+//     required: true
+//   },
+//   isDisabled:{
+//     type:Boolean
+//   },
+//   address: {
+//     streetAddress1: {
+//       type: String,
+//       required: true
+//     },
+//     streetAddress2: {
+//       type: String
+//     },
+//     city: {
+//       type: String,
+//       required: true
+//     },
+//     state: {
+//       type: String,
+//       required: true
+//     },
+//     country: {
+//       type: String,
+//       required: true
+//     },
+//     pincode: {
+//       type: String,
+//       required: true
+//     }
+//   },
+//   bankDetails: {
+//     accountNumber: {
+//       type: String,
+//       required: true
+//     },
+//     ifscCode: {
+//       type: String,
+//       required: true
+//     },
+//     upiId: {
+//       type: String,
+//       required: true
+//     }
+//   }
+// });
+
+// Create a model for the form data
+const FormData = mongoose.model('FormData', formDataSchema, formDataCollectionName);
+const User = mongoose.model('user', userSchema, userCollectionName);
+const Product = mongoose.model('Products', productSchema, productsName);
+const AcceptedProduct = mongoose.model('AcceptedProduct', acceptedProductSchema);
+const ProductApproval = mongoose.model('ProductApproval', productApprovalSchema);
+const Report = mongoose.model('Reports', reportSchema);
+// const Product2 = mongoose.model('Product', productSchema);
+
+// const User2 = mongoose.model('User', userSchema2);
+
+
+// Handle form submission
+app.post('/submit', async(req, res) => {
+    // console.log(req.body);
+
+    const { place, startTime, endTime, location, date, product } = req.body;
+
+    // await formDataSchema.biddings.insertOne(req.body)
+//   const { place,startTime,endTime,location,date,product } = req.body;
+
+  // Create a new form data document
+  const formData = new FormData({
+    place,
+    startTime,
+    endTime,
+    location,
+    date,
+    product,
+  });
+
+
+  // FormData.create(formData)
+  // .then(savedData => {
+  //   console.log('Document saved:', savedData);
+  //   // Handle the success case
+  // })
+  // .catch(error => {
+  //   console.error('Error saving document:', error);
+  //   // Handle the error case
+  // });
+
+// FormData.save(function(err,result){
+//     if (err){
+//         console.log(err);
+//     }
+//     else{
+//         // console.log(result)
+//     }
+// })
+
+  // Save the form data document to the database
+  formData.save()
+    .then(() => {
+      res.status(200).json({ message: 'Form data saved successfully' });
+    })
+    .catch((error) => {
+      console.error('Error saving form data', error);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+});
+
+// Route for fetching data from the MongoDB collection
+app.get('/offlinebidd', async (req, res) => {
+  // try {
+  //   // Connect to the MongoDB server
+  //   const client = new MongoClient(CONNECT_URL, {
+  //     useNewUrlParser: true,
+  //     useUnifiedTopology: true,
+  //   });
+  //   await client.connect();
+
+  //   // Access the database and collection
+  //   const db = client.db("esell2024");
+  //   const collection = db.collection("formdata");
+
+  //   // Fetch data from the collection
+  //   const data = await FormData.find({}).exec(); 
+    // {
+    // //   if (err) {
+    // //     console.error('Error fetching data from the collection:', err);
+    // //     return;
+    // //   }
+  // })
+    FormData.find({})
+    .then((data) => {
+
+    // Send the data as JSON
+    res.json(data);
+  } )
+  .catch((error) => {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Error fetching data' });
+  });
+});
+
+
+// Route for serving the offlinebidd.html page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'offlinebidd.html'));
+});
+
+app.get('/offlinebidd', async (req, res) => {
+  try {
+    // Fetch data from the collection based on the place field
+    const data = await FormData.find({ place: place }).exec();
+
+    // Send the data as JSON
+    res.json(data);
+    // const searchTerm = req.query.category.toLowerCase(); // Retrieve the search term from the query parameter
+
+    // let data;
+    // if (searchTerm) {
+    //   // Filter the data based on the category search term
+    //   data = await FormData.find({ place: { $regex: searchTerm, $options: 'i' } }).exec();
+    // } else {
+    //   // Fetch all data if no search term is provided
+    //   data = await FormData.find({}).exec();
+    // }
+    // res.json(data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+  });
+
+ 
+  
+ 
+  
+  
+  app.get('/admin2/users', (req, res) => {
+    
+    User.find({}, 'firstName email username isDisabled phoneNumber password')
+      .exec()
+      .then((users) => {
+        res.json(users);
+      })
+      .catch((error) => {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Internal server error' });
+      });
+  });
+  
+
+// Serve the admin.html page
+app.get('/admin2', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin2.html'));
+});
+  
+// // Route for deleting a form data document
+// app.delete('/offlinebidd/:id', async (req, res) => {
+//   const id = req.params.id;
+
+//   try {
+//     // Find the form data document by ID and remove it from the database
+//     await FormData.findByIdAndRemove(id);
+//     res.status(200).json({ message: 'Form data deleted successfully' });
+//   } catch (error) {
+//     console.error('Error deleting form data:', error);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
+
+// Route for deleting a user
+app.delete('/admin2/users/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Find the user by ID and remove it from the database
+    const user = await User.findByIdAndRemove(id).select('email');
+
+    // Send email notification to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: user.email, // Change this to the admin's email address
+      subject: 'User Deleted',
+      text: 'A user has been deleted by the admin.',
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
+
+app.post("/admin2/users/:id/block", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Find the user by ID and update their blocked status
+    const user = await User.findByIdAndUpdate(
+      id,
+      { $set: { blocked: true, blockedUntil: Date.now() + 7 * 24 * 60 * 60 * 1000 } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "User blocked successfully", user });
+  } catch (error) {
+    console.error("Error blocking user:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+
+// Define a route to fetch product data
+app.get('/product-approval/products', async(req, res) => {
+  // Find all products in the database
+  Product.find({})
+    .then(products => {
+      res.json(products);
+    })
+    .catch(error => {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    });
+});
+
+
+
+app.get('/product-approval', (req, res) => {
+  res.sendFile(path.join(__dirname, 'product-approval.html'));
+});
+
+
+
+// Multer storage configuration for Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'products',
+    allowed_formats: ['jpg', 'jpeg', 'png']
+  }
+});
+
+// Multer upload instance
+const upload = multer({ storage: storage });
+
+
+// Route to handle the POST request and save the accepted product
+// const ObjectId = mongoose.Types.ObjectId;
+
+app.post('/product-approval/accept/:productId', async (req, res) => {
+  const productId = req.params.productId;
+
+  try {
+    // Check if the provided productId is a valid ObjectId
+    // Find the product by its ID in the Product collection
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const { name, category, description, quantity, price, currentbid, images, date, time, email } = product;
+
+    // Create a new accepted product based on the found product
+    const acceptedProduct = new AcceptedProduct({
+      name,
+      category,
+      description,
+      quantity,
+      price,
+      currentbid,
+      date,
+      time,
+      email,
+      images,
+      user: User._id,
+      // Add other fields as needed
+    });
+
+    await acceptedProduct.save();
+
+    // Remove the product from the Product collection
+    await Product.findByIdAndRemove(productId);
+
+    // Send email to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: email,
+      subject: 'Product Approved',
+      text: `Dear ${email},\n\nYour product ${name} has been approved by the admin.\n\nThank you for using our platform!\n`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: error });
+      } else {
+        console.log('Email sent:', info.response);
+        res.status(200).json({ message: 'Product accepted and moved to accepted products. Email sent to user.' });
+      }
+    });
+  } catch (error) {
+    console.error('Error accepting product:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/product-approval/reject/:productId', async (req, res) => {
+  const productId = req.params.productId;
+
+  try {
+    // Check if the provided productId is a valid ObjectId
+    // Find the product by its ID in the Product collection
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Remove the product from the Product collection
+    await Product.findByIdAndRemove(productId);
+
+    res.status(200).json({ message: 'Product rejected' });
+  } catch (error) {
+    console.error('Error rejecting product:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/product-approval/send-rejection-email', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Send email to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: email,
+      subject: 'Product Rejected',
+      text: `Dear ${email},\n\nWe regret to inform you that your product has been rejected by the admin.\n\nThank you for using our platform!\n`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: error });
+      } else {
+        console.log('Email sent:', info.response);
+        res.status(200).json({ message: 'Rejection email sent' });
+      }
+    });
+  } catch (error) {
+    console.error('Error sending rejection email:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+// Define a route to handle the request for the "reportviews" page
+app.get('/reportview/reports', (req, res) => {
+  // Fetch all reports from the MongoDB collection
+  Report.find({})
+    .exec()
+    .then((reports) => {
+      res.json(reports);
+    })
+    .catch(error => {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  });
+  
+});
+
+
+//justin server
 // Create a route for handling the signup form submission
 app.post('/signup', (req, res) => {
   // Extract the form data from the request
@@ -157,10 +696,6 @@ app.post('/signup', (req, res) => {
    });
 });
 
-
-
-
-
 // LoGIN FORM
 
 app.post('/login', async (req, res) => {
@@ -170,7 +705,7 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ username, password });
     if (user) {
       // Successful login
-      res.json({ message: 'Login successful' });
+      res.json(user);
     } else {
       // Invalid credentials
       res.status(401).json({ error: 'Invalid username or password' });
@@ -180,51 +715,14 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-// Define a schema for the product
-const productSchema = new mongoose.Schema({
-  name: String,
-  category: String,
-  description: String,
-  quantity: Number,
-  price: Number,
-  currentBid: Number,
-  date: Date,
-  email: String,
-  images: [String], // Store an array of image URLs
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
-});
 
-// Define a model for the product using the schema
-const Product = mongoose.model('Product', productSchema);
-
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors());
-
-// Multer storage configuration for Cloudinary
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'products',
-    allowed_formats: ['jpg', 'jpeg', 'png']
-  }
-});
-
-// Multer upload instance
-const upload = multer({ storage: storage });
-
-// ...
 
 // Define the route for form submission
 app.post('/submit-form', upload.array('images', 5), async (req, res) => {
   // Get the form data from the request body
   const { name, category, description, quantity, price, currentBid, date, email } = req.body;
   const images = req.files.map(file => file.path); // Store an array of Cloudinary URL paths
-
+console.log(email);
   try {
     // Find the user in the MongoDB collection based on the email
     const user = await User.findOne({ email });
@@ -263,14 +761,12 @@ app.post('/submit-form', upload.array('images', 5), async (req, res) => {
   }
 });
 
-
-
 ////////////////////--display pro---////////////////////////////////////
-// Set up route to retrieve product details
+
 // Set up route to retrieve product details
 app.get('/acceptedproducts', async (req, res) => {
   try {
-    const acceptedproducts = await Product.find().exec();
+    const acceptedproducts = await AcceptedProduct.find().exec();
     res.json(acceptedproducts);
   } catch (error) {
     console.error('Error retrieving product details from MongoDB:', error);
@@ -281,7 +777,7 @@ app.get('/acceptedproducts', async (req, res) => {
 app.get('/acceptedproducts/:id', async (req, res) => {
   try {
     const productId = req.params.id;
-    const product = await Product.findById(productId);
+    const product = await AcceptedProduct.findById(productId);
 
     if (product) {
       res.json(product);
@@ -293,6 +789,7 @@ app.get('/acceptedproducts/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 /////////// pro details display///////////////////
 
@@ -317,42 +814,126 @@ app.get('/generate-pages', async (req, res) => {
   }
 });
 
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
 const bidSchema = new mongoose.Schema({
-  productId: String,
-  currentBid: Number,
+  productId: {
+    type: String,
+    required: true
+  },
+  currentBid: {
+    type: Number,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  }
 });
+
+// Create the Bid model
 const Bid = mongoose.model('Bid', bidSchema);
+
+// POST /bids route handler
+let lastEmail = ''; // Variable to store the last email for the current bid
+
+
+
 app.post('/bids', (req, res) => {
-  const { productId, currentBid } = req.body;
+  const { productId, currentBid, email } = req.body;
 
   // Create a new Bid instance
-  const bid = new Bid({ productId, currentBid });
+  const bid = new Bid({ productId, currentBid, email });
 
   // Save the bid to the database
   bid.save()
-  .then(() => {
-    res.sendStatus(200);
-  })
-  .catch((err) => {
-    console.error('Error saving bid:', err);
-    res.status(500).json({ error: 'Error saving bid' });
-  });
+    .then(() => {
+      lastEmail = email; // Update the last email with the current bid's email
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.error('Error saving bid:', err);
+      res.status(500).json({ error: 'Error saving bid' });
+    });
 });
+
+// Define the sendEmail function
+// Define the sendEmail function
+function sendEmail(email, userDetails) {
+  return new Promise((resolve, reject) => {
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: email,
+      subject: 'Congratulations! You won the bid',
+      text: `Congratulations! You have won the bid for the product. Here are your details:\n\nEmail: ${userDetails.email}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        reject(error);
+      } else {
+        console.log('Email sent:', info.response);
+        resolve();
+      }
+    });
+  });
+}
+
+app.get('/latest-email', (req, res) => {
+  const latestEmail = lastEmail; // Store the last email in a separate variable
+
+  // Fetch the user details from the User schema based on the latest email
+  User.findOne({ email: latestEmail })
+    .exec()
+    .then((Product) => {
+      if (Product) {
+        const userDetails = {
+        
+          email: Product.email,
+          
+        };
+
+        // Send email only if the latest email and user details exist
+        if (latestEmail && userDetails) {
+          sendEmail(latestEmail, userDetails)
+            .then(() => {
+              res.status(200).json({ message: 'Email sent to the latest recipient.' });
+            })
+            .catch((err) => {
+              console.error('Error sending email:', err);
+              res.status(500).json({ error: 'Error sending email' });
+            });
+        } else {
+          res.status(404).json({ error: 'No latest email or user details found.' });
+        }
+      } else {
+        res.status(404).json({ error: 'No user found with the latest email.' });
+      }
+    })
+    .catch((err) => {
+      console.error('Error fetching user details:', err);
+      res.status(500).json({ error: 'Error fetching user details' });
+    });
+});
+
 app.get('/bids/:productId', (req, res) => {
   const productId = req.params.productId;
-
   // Find the latest bid for the given product
   Bid.findOne({ productId })
     .sort({ currentBid: -1 }) // Sort in descending order of currentBid
     .exec()
     .then((bid) => {
       if (bid) {
-        res.status(200).json({ currentBid: bid.currentBid });
+        const { email, currentBid } = bid;
+        res.status(200).json({ email, currentBid });
+        console.log(email);
       } else {
         res.status(404).json({ error: 'No bid found for the product' });
       }
@@ -361,4 +942,247 @@ app.get('/bids/:productId', (req, res) => {
       console.error('Error fetching current bid:', err);
       res.status(500).json({ error: 'Error fetching current bid' });
     });
+});
+
+///dony server
+//EMAIL FOR SIGNUP
+// EMAIL FOR SIGNUP
+app.post('/signup', async (req, res) => {
+  try {
+    // Extract the form data from the request
+    const { username, password, email, phonenumber, firstname, lastname, isDisabled, addressLine1, addressLine2, accountNumber, ifscCode, upiId, state, Country, pincode, city } = req.body;
+
+    const existingUser = await User.findOne({ email});
+    const existingUsername = await User.findOne({ username});
+
+    if (existingUser) {
+      res.json('Email already exists')
+      return res.status(400);
+    }
+   else  if (existingUsername) {
+      res.json('username already exists')
+      return res.status(400);
+    }
+    else{
+
+    const bankDetails = {
+      accountNumber,
+      ifscCode,
+      upiId
+    }
+    const address = {
+      streetAddress1: addressLine1,
+      streetAddress2: addressLine2,
+      country: Country,
+      state,
+      pincode,
+      city,
+    }
+
+    // Create a new user instance
+    const newUser = new User({
+      username,
+      password,
+      email,
+      phoneNumber: phonenumber,
+      firstName: firstname,
+      lastName: lastname,
+      isDisabled,
+      address,
+      bankDetails,
+    });
+
+    // Save the user to the database
+    await newUser.save();
+    res.json('success')
+  }
+
+    // Send registration email to the user
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'esellbid@gmail.com',
+        pass: 'xydtsjpmirtyjkwo',
+      },
+    });
+
+    const mailOptions = {
+      from: 'esellbid@gmail.com',
+      to: email,
+      subject: 'Welcome to Our Website',
+      text: 'Thank you for registering on our website!',
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: error });
+      } else {
+        console.log('Email sent:', info.response);
+        res.status(200).json({ message: 'User created successfully. Registration email sent.' });
+      }
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Error creating user' });
+  }
+});
+
+
+app.post('/forgor-password', async (req, res) => {
+  const { email } = req.body;
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'esellbid@gmail.com',
+      pass: 'xydtsjpmirtyjkwo',
+    },
+  });
+
+  const mailOptions = {
+    from: 'esellbid@gmail.com',
+    to: email,
+    subject: 'Forgot Password',
+    text: ' To reset password click this link \n http://127.0.0.1:5500/project/forgotpass/link.html',
+  };
+
+  // Create reusable transporter object using the default SMTP transport
+
+ var user = await User.findOne({ email });
+ console.log(user);
+ 
+    if (user) {
+      req.session.email = email;
+      console.log(email);
+      console.log(user.email);
+      // Compare the provided password with the stored hashed password
+      var match = email === user.email;
+      
+        console.log(match);
+          if (match) {
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.error(error)
+                res.status(500).json({ error: error });
+              } else {
+                console.log('Email sent:', info.response);
+                res.status(200).json({ message: 'Password reset email sent successfully' });
+              }
+            });
+            // Passwords match, user is authenticated
+          } else {
+            // Passwords don't match, authentication failed
+            res.status(401).json({ message: 'Email not registered' });
+          }
+    } else {
+      // User not found
+      res.status(404).json({ message: 'User not found' });
+    }
+    
+  })
+
+
+  //NEW PASS LINK
+app.post('/link', async (req, res) => {
+  const { newPassword } = req.body;
+  const forgotmail=req.header('forgotmail')
+  console.log(forgotmail);
+
+  try {
+
+    const user = await User.findOne({ email:forgotmail });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+
+    // Update the user's password
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ error: 'An error occurred while resetting the password' });
+  }
+});
+
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'esellbid@gmail.com',
+    pass: 'xydtsjpmirtyjkwo',
+  },
+});
+
+app.post('/reports', function (req, res) {
+  // Get the form data from the request body
+  const { username, reason, enterreason, detaileddescr } = req.body;
+
+  // Create a new report instance
+  const report = new Report({
+    username,
+    reason,
+    otherReason: enterreason,
+    detailedDescription: detaileddescr,
+  });
+
+  // Save the report to the database
+  report.save()
+    .then(() => {
+      console.log('Report saved successfully');
+
+      // Find the user with the reported username
+      User.findOne({ username: username })
+        .then((user) => {
+          if (user) {
+            const userEmail = user.email;
+
+            // Send email notification to the reported user's email address
+            const mailOptions = {
+              from: 'esellbid@gmail.com',
+              to: userEmail,
+              subject: 'You have been reported',
+              text: 'You have been reported on our website. Please review your activities and adhere to our policies.',
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.error('Error sending email:', error);
+              } else {
+                console.log('Email sent:', info.response);
+              }
+            });
+          } else {
+            console.log('User not found with the reported username');
+          }
+        })
+        .catch((error) => {
+          console.error('Error finding user:', error);
+        });
+
+      res.sendStatus(200);
+    })
+    .catch((error) => {
+      console.error('Error saving report:', error);
+      res.status(500).send('Error saving report to the database');
+    });
+});
+
+// Start 
+app.listen(3000, () => {
+  console.log('Server started on port 8080');
+});
+
+
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
