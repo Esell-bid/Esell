@@ -117,7 +117,8 @@ app.listen(3000, () => {
 
 
 //EMAIL FOR SIGNUP
-// EMAIL FOR SIGNUP
+
+
 app.post('/signup', async (req, res) => {
   try {
     // Extract the form data from the request
@@ -470,6 +471,8 @@ app.post('/link', async (req, res) => {
 
 
 //REPORT
+
+
 const reportSchema = new mongoose.Schema({
   username: String,
   reason: String,
