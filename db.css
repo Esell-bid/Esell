@@ -1,0 +1,205 @@
+/* Reset styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    line-height: 1.5;
+  }
+  
+  header {
+    background-color: #333;
+    padding: 20px;
+    color: #fff;
+  }
+  
+  header h1 {
+    font-size: 24px;
+  }
+  
+  nav ul {
+    list-style: none;
+  }
+  
+  nav ul li {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  
+  nav ul li a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  main {
+    padding: 20px;
+  }
+  
+  .overview {
+    margin-bottom: 20px;
+  }
+  
+  .overview h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .stats {
+    display: flex;
+  }
+  
+  .stat {
+    background-color: #fff;
+    padding: 20px;
+    margin-right: 10px;
+    flex-basis: 33%;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .recent-auctions h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .auction-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+  }
+  
+  .auction {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .auction h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  footer {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    top: 510px;
+  }
+  .allpro{
+    background:none;
+}
+.pro{
+	overflow: hidden;
+	background: #ffffff;
+	color: #21201e;
+	width: 16%;
+	height: 300px;
+	display:flex;
+	flex-direction:column;
+	align-items:start;
+	justify-content:left;
+    margin-top: 30px;
+    border-radius: 15px;
+    margin-left: 110px;
+    border: 2px solid #000000;
+	
+}
+.pro img {
+	height: 150px;
+    width: 60%;
+    margin-left: 50px;
+    margin-top: 20px;
+}
+
+.proinfo{
+    background: none;
+    margin-top: 15px;
+    width:90%;
+    height: 45%;
+    margin-left: 5%;
+    margin-bottom: 5%;
+    border-radius: 10px;
+    border: 2px solid #000000;
+    
+    
+}
+.protitle{
+    display: flex;
+    padding-top: 10px;
+    padding-left: 35%;
+}
+.proprice{
+    display:flex;
+    padding-left: 30%;
+    padding-top: 5px;
+}
+.prodate{
+    display:flex;
+    padding-left: 25%;
+    padding-top: 5px;
+}
+.card-container {
+  display: inline-block;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+}
+
+.card {
+  display: inline-grid;
+  padding-right: 40px;
+  margin-left: 50px;
+  margin-top: 10px;
+  width: 300px;
+  height: 400px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  border-width: 2px;
+}
+
+.card .images {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.card .title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  text-align:left;
+}
+
+.card .description {
+  margin: 10px 0;
+  color: #666;
+  text-align:left;
+}
+
+.card .price {
+  font-size: 16px;
+  color: #777;
+  text-align:left;
+}
