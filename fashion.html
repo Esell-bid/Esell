@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion</title>
+    <link rel="stylesheet" href="/category.css">
+</head>
+<body>
+    <div class="top">
+        <div class="search">
+            <input type="text" placeholder="Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div class="icon">
+            <img src="/logo-black-removebg-preview.png" alt="ESELL" style="width: 105px; height: 60px; margin-top: -90px; margin-left: 50px;">
+        </div>
+        <nav class="navbar">
+            <ul class="navbar-list">
+              <li><a href="/main2.html">Home</a></li>
+            </ul>
+          </nav>
+    </div>
+    <div class="box">
+        <h5 class="category">FASHION</h5> 
+        <div class="image">
+            <img src="/fashion.jpeg" style="height: 178px;width: 298px;">
+        </div>    
+    </div>
+    <div class="side">
+        <h2 style="background: none; text-align: center;padding-top: 20px;">SHOP BY CATEGORY</h2>
+        <a href="/furniture.html">FURNITURE</a>
+        <a href="/vehicle.html">VEHICLE</a>
+        <a href="/fashion.html">FASHION</a>
+        <a href="/fruits_vegi.html">FRUITS AND VEGETABLES</a>
+        <a href="/electronics.html">ELECTRONICS</a>
+        <a href="/Artwork.html">ART WORK</a>
+        <a href="/other.html">OTHER</a>
+    </div>
+   <div class="bottom">
+        <section class="products">
+            <div class="all-products" id="productContainer">
+                <!-- Product placeholders -->
+            </div>
+        </section>
+       
+    </div>
+
+    <script>
+                  function displayProductDetails(acceptedproducts) {
+  const productContainer = document.getElementById('productContainer');
+
+  acceptedproducts.forEach((product) => {
+    if (product.category === selectedCategory) {
+      console.log(product); // Log the product data for debugging
+
+      const productDiv = document.createElement('div');
+      productDiv.classList.add('product');
+
+      const productLink = document.createElement("a");
+      productLink.href = `/p.html?id=${product._id}`;
+      productLink.appendChild(productDiv);
+      productContainer.appendChild(productLink);
+
+      const productImage = document.createElement('img');
+      productImage.src = product.images[0]; // Display the first image
+
+      const productInfoDiv = document.createElement('div');
+      productInfoDiv.classList.add('product-info');
+
+      const productName = document.createElement('h4');
+      productName.classList.add('product-title');
+      productName.textContent = product.name;
+
+      const productPrice = document.createElement('p');
+      productPrice.classList.add('product-price');
+      productPrice.textContent = 'Price: ' + product.price;
+
+      const bidButton = document.createElement('button');
+      bidButton.classList.add('product-btn');
+      bidButton.textContent = 'Bid Now';
+
+      bidButton.addEventListener('click', () => {
+        window.location.href = '/pdetails.html?id=' + product._id;
+        console.log('Bid Now button clicked for product:', product.name);
+      });
+
+      productInfoDiv.appendChild(productName);
+      productInfoDiv.appendChild(productPrice);
+      productDiv.appendChild(productImage);
+      productDiv.appendChild(productInfoDiv);
+      productInfoDiv.appendChild(bidButton);
+      productContainer.appendChild(productDiv);
+    }
+  });
+}
+
+        async function fetchProductDetails(selectedCategory) {
+  try {
+    const response = await fetch('http://localhost:3000/acceptedproducts');
+    const acceptedproducts = await response.json();
+
+    if (response.ok) {
+      displayProductDetails(acceptedproducts, selectedCategory);
+    } else {
+      console.error('Error fetching product details:', acceptedproducts.error);
+    }
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+  }
+}
+
+
+// Example usage: Fetch and display products with category "Electronics"
+        const selectedCategory = 'Fashion';
+        fetchProductDetails(selectedCategory);
+
+    
+    </script>
+</body>
