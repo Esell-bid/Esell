@@ -253,6 +253,7 @@ const productApprovalSchema = new mongoose.Schema({
 // Create a model for the form data
 const FormData = mongoose.model('FormData', formDataSchema, formDataCollectionName);
 const User = mongoose.model('user', userSchema, userCollectionName);
+
 const Product = mongoose.model('Products', productSchema, productsName);
 const AcceptedProduct = mongoose.model('AcceptedProduct', acceptedProductSchema);
 const ProductApproval = mongoose.model('ProductApproval', productApprovalSchema);
@@ -1170,6 +1171,39 @@ app.post('/reports', function (req, res) {
       res.status(500).send('Error saving report to the database');
     });
 });
+// Define the Product and User models
+const Produc = mongoose.model('Product', productSchema);
+const Use = mongoose.model('User', userSchema);
+
+
+// Define a route to handle the product data request
+app.get('/Acceptedproducts', async (req, res) => {
+  try {
+    // Retrieve product data from the "acceptedproducts" collection
+    const products = await Produc.find();
+
+    // Send the products as JSON response
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Define a route to handle the user data request
+app.get('/users', async (req, res) => {
+  try {
+    // Retrieve user data from the "users" collection
+    const users = await Use.find();
+
+    // Send the users as JSON response
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Start 
 app.listen(3000, () => {
@@ -1177,12 +1211,5 @@ app.listen(3000, () => {
 });
 
 
-app.get('/users', async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+
+
