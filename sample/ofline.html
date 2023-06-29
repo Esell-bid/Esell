@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('/img/offline.jpg');
+            background-repeat: no-repeat;
+            background-size: 1535px 752px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      display: flex;
+      margin-top:190px;
+      background-color: rgb(247, 212, 212);
+      height: 40vh; 
+      
+    }
+   
+    .form-group {
+      display: block;
+      padding: 10px 30px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+    }
+
+    .logo {
+    padding-left: 2px;
+    padding-top: 2px;
+    width: 120px;
+    height: 8vh;
+}
+  
+  </style>
+</head>
+<body>
+    <img src="/img/logo-black-removebg-preview.png" class="logo">
+  <div class="container">
+    <h2>Upload your offline bidding details here</h2>
+   <form>
+      <div class="form-group">
+        <div style="text-align: center;">
+            <label onclick="window.location.href='/offlinebid.html'" for="file-upload">upload here</label>
+          </div>
+         </div>
+    </form>
+    <div>
+      <h2 style="padding-top: 150px;margin-left: -500px;margin-top: 50px;">View Offline details here</h2>
+     <form>
+        <div class="form-group" style="margin-top: -60px;margin-left: -130px;">
+          <div style="text-align: center;">
+              <label  onclick="window.location.href='/offlinebidd.html'" for="file-upload">View here</label>
+            </div>
+           </div>
+      </form>
+  </div>
+</body>
+</html>

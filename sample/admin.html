@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <style>
+    /* Reset some default styles */
+    body, h1, h2, h3, h4, h5, h6, p, ul, li, table {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    /* Header */
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Navigation */
+    nav {
+      background-color: #666;
+      color: #fff;
+      padding: 10px;
+    }
+
+    nav ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    nav ul li {
+      display: inline;
+      margin-right: 10px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    /* Main Content */
+    .container {
+      margin: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      margin-bottom: 20px;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* .action-buttons a {
+      margin-right: 5px;
+      text-decoration: none;
+      padding: 5px 10px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 3px;
+    } */
+
+    /* Footer */
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+  </header>
+  
+  <nav>
+    <ul>
+      <li><a href="admin-dashboard.html">Dashboard</a></li>
+      <li><a href="user-list.html">Users</a></li>
+      <li><a href="product-approval.html">Product Approval</a></li>
+      <li><a href="settings.html">Settings</a></li>
+    </ul>
+  </nav>
+  
+  
+  <div class="container">
+    <h1>Welcome, Admin!</h1>
+    
+    <div class="card">
+      <h2>Statistics</h2>
+      <p>Total number of bids: 500</p>
+      <p>Total number of users: 100</p>
+      <p>Total number of products: 50</p>
+    </div>
+    
+    <div class="card">
+      <h2>Recent Bids</h2>
+      <ul>
+        <li>Bid 1 - Product: Product A, User: User 1</li>
+        <li>Bid 2 - Product: Product B, User: User 2</li>
+        <li>Bid 3 - Product: Product C, User: User 3</li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h2>Recent Users</h2>
+      <table id="userTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>username</th>
+            <th>Actions</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="card">
+      <h2>Recent Products</h2>
+      <ul>
+        <li>Product A</li>
+        <li>Product B</li>
+        <li>Product C</li>
+      </ul>
+    </div>
+  </div>
+  <script src="admin.js"></script>
+  
+  <footer>
+    &copy; 2023 Admin Dashboard. All rights reserved.
+  </footer>
+</body>
+</html>

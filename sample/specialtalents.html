@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>specialtalents</title>
+    <link rel="stylesheet" href="specialtalents.css">
+</head>
+<body>
+  <div class="banner">
+        <!-- Rest of the HTML code -->
+        <nav class="navbar">
+            <img src="img/logo-no-background.png" class="logo">
+            <ul class="navbar-list">
+              <li><a href="/main2.html">Home</a></li>
+              <li><a href="/profile.html">Profile</a></li>
+              <li><a href="/firstpage.html">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="text">
+            <p1>UNLEASH YOUR CREATIVITY</p1>
+        </div>
+        <div class="rectangle1">
+            <div class="text1">
+              CONQUER
+            </div>
+        </div>
+        <div class="rectangle2">
+            <div class="text3">
+              SELF
+            </div>
+        </div>
+      
+        <img src="img/sptl.png" class="mimage">
+  </div>
+        <!-- <form>
+            <input type="search" class="search-bar" placeholder="Search...">
+            <input type="submit" value="Search" class="search">
+        </form> -->
+      
+      
+      <section class="products">
+              <div class="all-products" id="productContainer">
+                  <!-- Product placeholders -->
+              </div>
+      </section>
+      
+         
+      
+  
+      <script>
+                         function displayProductDetails(acceptedproducts) {
+    const productContainer = document.getElementById('productContainer');
+  
+    acceptedproducts.forEach((product) => {
+      if (product.category === selectedCategory) {
+        console.log(product); // Log the product data for debugging
+  
+        const productDiv = document.createElement('div');
+        productDiv.classList.add('product');
+  
+        const productLink = document.createElement("a");
+        productLink.href = `/pdetails.html?id=${product._id}`;
+        productLink.appendChild(productDiv);
+        productContainer.appendChild(productLink);
+  
+        const productImage = document.createElement('img');
+        productImage.src = product.images[0]; // Display the first image
+  
+        const productInfoDiv = document.createElement('div');
+        productInfoDiv.classList.add('product-info');
+  
+        const productName = document.createElement('h4');
+        productName.classList.add('product-title');
+        productName.textContent = product.name;
+  
+        const productPrice = document.createElement('p');
+        productPrice.classList.add('product-price');
+        productPrice.textContent = 'Price: ' + product.price;
+  
+        const bidButton = document.createElement('button');
+        bidButton.classList.add('product-btn');
+        bidButton.textContent = 'Bid Now';
+  
+        bidButton.addEventListener('click', () => {
+          window.location.href = '/pdetails.html?id=' + product._id;
+          console.log('Bid Now button clicked for product:', product.name);
+        });
+  
+        productInfoDiv.appendChild(productName);
+        productInfoDiv.appendChild(productPrice);
+        productDiv.appendChild(productImage);
+        productDiv.appendChild(productInfoDiv);
+        productInfoDiv.appendChild(bidButton);
+        productContainer.appendChild(productDiv);
+      }
+    });
+  }
+  
+          async function fetchProductDetails(selectedCategory) {
+    try {
+      const response = await fetch('http://localhost:3000/acceptedproducts');
+      const acceptedproducts = await response.json();
+  
+      if (response.ok) {
+        displayProductDetails(acceptedproducts, selectedCategory);
+      } else {
+        console.error('Error fetching product details:', acceptedproducts.error);
+      }
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+    }
+  }
+  
+  
+  // Example usage: Fetch and display products with category "Electronics"
+          const selectedCategory = 'Fruits and vegetables';
+          fetchProductDetails(selectedCategory);
+  
+            
+                </script>
+  </body>
+</script>
+
+</body>
+</html>

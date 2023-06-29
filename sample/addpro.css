@@ -1,0 +1,87 @@
+.labels{
+  display: inline-block;
+  font-size: large;
+}
+.inputbox{
+  display: inline-block;
+  padding-left: 30px;
+  margin-left: 150px;
+  
+}
+.a{
+  width: 600px;
+  height: 100px;
+}
+.aligned-text{
+  text-align: center;
+  padding-bottom: 20px;
+}
+.b{
+  width: 300px;
+  height: 30px;
+}
+.c{
+  height: 30px;
+}
+.f{
+  padding-top:0px;
+  padding-left: 130px;
+}
+
+.rectangle{
+  display: inline-block;
+  position: relative;
+  left: -20px;
+}
+
+.a{
+  margin-left: 70px;
+  width: 600px;
+  height: 100px;
+}
+.aligned-text{
+  text-align: center;
+  padding-bottom: 20px;
+}
+.b{
+  margin-left: 50px;
+  width: 300px;
+  height: 30px;
+}
+.c{
+  margin-left: 40px;
+  height: 30px;
+}
+.d{
+  margin-left: 90px;
+}
+.e{
+  margin-left: 60px;
+}
+.rectangle{
+  display: inline-block;
+  position: relative;
+  left: -20px;
+}
+ .h{
+   margin-left:600px;
+   width: 250px;
+   height: 50px;
+   border-radius: 30px;
+   cursor: pointer;
+   background-color: rgb(229, 148, 148);
+ }
+ .h:hover {
+   background-color: rgb(82, 237, 149);
+ }
+ 
+ .container{
+   background-color: rgb(228, 229, 229);
+ }
+.btns{
+  margin-left: 150px;
+}
+.l{
+  margin-left: 10px;
+  padding: 20px;
+}

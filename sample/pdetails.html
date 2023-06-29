@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details</title>
+  <style>
+    body {
+      background-repeat: no-repeat;
+      background-size: 1560px 1085px;
+      font-family: Arial, sans-serif;
+    }
+   
+    .container {
+      max-width: 800px;
+      margin: 0px auto;
+      padding: 20px;
+      border: 8px solid #090909;
+      text-align: center;
+      background-color: #fff;
+    }
+
+    .card {
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+
+    h2 {
+      font-size: 30px;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      font-size: 18px;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .price {
+  margin-top: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+    .timer {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 40px;
+      margin-right: 500px;
+      color: #333;
+    }
+    .bid-button {
+  margin-left:200px;
+  margin-top: -50px;
+  box-shadow: 0px 10px 25px 3px rgba(255, 125, 26, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+}
+.btn-orange {
+  padding: 0.4rem 3rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color:#fff;
+  background-color:chocolate;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+}
+.price-btns {
+  width: 40%;
+  margin-left: 0px;
+  margin-bottom: -40px;
+  padding: 1rem 1rem;
+  border: none;
+  background-color:hsl(223, 64%, 98%);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3.5rem;
+}
+.price-box__main-new {
+  font-size: 3rem;
+  font-weight: 600;
+  padding-left: 0px;
+  width: 500px;
+}
+.img-main {
+  width: 500px;
+  border-radius: 5%;
+  cursor: pointer;
+
+  margin-bottom: 3.5rem;
+  box-shadow:0px 10px 25px 3px rgba(0, 0, 0, 0.5);
+}
+
+.img-main__btn {
+  display: none;
+}
+
+.img-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  width:50%;
+}
+
+.img-btn {
+  margin-top: -40px;
+  width: 180px;
+    display: block;
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: 10%;
+    transition: all 0.3s;
+    position: relative;
+    height: 172px;
+    float: left;
+    box-shadow:0px 10px 25px 3px rgba(0, 0, 0, 0.5);
+   
+}
+
+.img-btn::after {
+  content: "";
+  max-width: 100%;
+  height: 100%;
+  background-color:#fff;
+  border-radius: 10%;
+  border: 3px solid transparent;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+}
+.item {
+  padding: 0 3rem;
+  max-width: 100%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 0.8fr 1fr;
+  gap: 10rem;
+}
+.img-btn:hover {
+  background-color:chocolate;
+}
+
+.img-btn:hover::after {
+  border: 3px solid chocolate ;
+  opacity: 0.5;
+}
+
+.img-btn__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10%;
+  border: 3px solid transparent;
+  transition: all 0.3s;
+  transform-origin: bottom;
+}
+
+    .starting-price {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .bids-container {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .bid {
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+    }
+
+    .bid:nth-child(2n) {
+      background-color: #f0f0f0;
+    }
+    .details{
+      width:50%;
+      margin-top: 100px;
+    }
+    .logo {
+      width: 140px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="item" id="productContainer"></div>
+
+  <script>
+    // Function to start the timer
+    function startTimer(duration, display) {
+  let timer = duration;
+  let minutes, seconds;
+
+  const intervalId = setInterval(async function () {
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    display.textContent = minutes + ":" + seconds;
+
+    if (--timer < 0) {
+      clearInterval(intervalId);
+
+      // Timer has ended, fetch the latest email
+      await fetchLatestEmail();
+      alert("Bid over time completed")
+      console.log("Bid completed")
+    }
+  }, 1000);
+}
+
+
+// Function to retrieve the latest email when the timer ends
+
+
+    
+
+    async function fetchProductDetails() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        const response = await fetch(`http://localhost:3000/acceptedproducts/${productId}`);
+        const product = await response.json();
+
+        if (response.ok) {
+          const bidResponse = await fetch(`http://localhost:3000/bids/${productId}`);
+          const bidData = await bidResponse.json();
+
+          if (bidResponse.ok) {
+            displayProductDetails(product, productId, bidData.currentBid);
+          } else {
+            console.error('Error fetching current bid:', bidData.error);
+            displayProductDetails(product, productId, null);
+          }
+        } else {
+          console.error('Error fetching product details:', product.error);
+        }
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+      }
+    }
+
+    function saveBid(productId, currentBid) {
+      const email = localStorage.getItem('userEmail');
+
+      // Create the bid object with the productId, currentBid, and email
+      const bid = {
+        productId: productId,
+        currentBid: currentBid,
+        email: email
+      };
+
+      fetch('http://localhost:3000/bids', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bid)
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Bid placed successfully!');
+        } else {
+          console.error('Error saving bid:', response.status);
+        }
+      })
+      .catch(error => {
+        console.error('Error saving bid:', error);
+      });
+    }
+
+    function displayProductDetails(product, productId, currentBidData) {
+      const productContainer = document.getElementById('productContainer');
+    
+      
+
+      const pic = document.createElement("section");
+      pic.classList.add("img");
+     
+      const details = document.createElement("div");
+      details.classList.add("details");
+      
+
+      // Iterate over the images array and create img elements within the pic container
+      if (product.images.length > 0) {
+  var imageUrl = product.images[0]; // Get the first image URL
+  var image = document.createElement("img");
+  image.src = imageUrl;
+  image.alt = "Product Image";
+  image.classList.add("img-main");
+  pic.appendChild(image);
+}
+const bt = document.createElement("div");
+      bt.classList.add("img-btns");
+      
+      for (var i = 0; i < product.images.length; i++) {
+  var imageUrl = product.images[i];
+  var button = document.createElement("button");
+  button.className = "img-btn";
+  var image = document.createElement("img");
+  image.src = imageUrl;
+  image.alt = "Product Image";
+  image.classList.add("img-btn__img");
+  button.appendChild(image);
+  bt.appendChild(button);
+}
+
+      
+      pic.appendChild(bt);
+      const title = document.createElement("h2");
+      title.textContent = product.name;
+      details.appendChild(title);
+
+      const description = document.createElement("p");
+      description.textContent = "Description: " + product.description;
+      details.appendChild(description);
+
+      const quantity = document.createElement("p");
+      quantity.textContent = "Quantity: " + product.quantity;
+      details.appendChild(quantity);
+
+      const endDate = document.createElement("p");
+      endDate.textContent = "End Date: " + product.date;
+      details.appendChild(endDate);
+
+      const price = document.createElement("p");
+      price.classList.add("starting-price");
+      price.textContent = "Starting Price: " + product.price;
+      details.appendChild(price);
+      
+      const email = document.createElement("p");
+      email.classList.add("starting-price");
+      email.textContent = "email: " + product.email;
+      details.appendChild(email);
+
+      const currentBid = document.createElement("p");
+      currentBid.classList.add("price-box__main-new");
+      currentBid.textContent = "Current Bid: " + (currentBidData ? currentBidData : "No bid placed yet");
+      details.appendChild(currentBid);
+
+      const bidInput = document.createElement("input");
+      bidInput.classList.add("price-btns");
+      bidInput.type = "number";
+      bidInput.placeholder = "Enter your bid";
+      details.appendChild(bidInput);
+
+      const bidButton = document.createElement("button");
+      bidButton.classList.add("bid-button");
+      bidButton.classList.add("btn-orange");
+      bidButton.textContent = "Place Bid";
+      bidButton.addEventListener("click", () => {
+        const newBid = bidInput.value;
+        if (newBid > currentBidData) {
+          saveBid(productId, newBid);
+        } else {
+          alert("Please enter a higher bid amount.");
+        }
+      });
+      details.appendChild(bidButton);
+      
+      const bidsContainer = document.createElement("div");
+      bidsContainer.classList.add("bids-container");
+      details.appendChild(bidsContainer);
+      productContainer.appendChild(pic);
+      productContainer.appendChild(details);
+   
+
+      // Calculate the remaining time based on the starting time
+      const startingTime = new Date(product.date).getTime();
+      const currentTime = new Date().getTime();
+      const remainingTime = startingTime - currentTime;
+      const duration = Math.ceil(remainingTime / 1000); // Convert to seconds
+
+      // Display the timer
+      const timerDisplay = document.createElement("div");
+      timerDisplay.classList.add("timer");
+      timerDisplay.textContent = formatTime(duration);
+      details.appendChild(timerDisplay);
+
+      // Start the timer
+      startTimer(duration, timerDisplay);
+    }
+ 
+
+
+// ...
+
+
+
+    // Function to format time in hh:mm:ss format
+    function formatTime(duration) {
+      let hours = Math.floor(duration / 3600);
+      let minutes = Math.floor((duration % 3600) / 60);
+      let seconds = duration % 60;
+
+      hours = hours < 10 ? "0" + hours : hours;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+      return hours + ":" + minutes + ":" + seconds;
+    }
+    async function fetchLatestEmail() {
+      try {
+        const response = await fetch('http://localhost:3000/latest-email');
+        const data = await response.json();
+
+        if (response.ok) {
+          const latestEmail = data.email;
+          console.log('Latest email:', latestEmail);
+          // Use the latestEmail as needed in your client-side code
+        } else {
+          console.error('Error fetching latest email:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching latest email:', error);
+      }
+    }
+
+    fetchProductDetails();
+    
+  </script>
+</body>
+</html>

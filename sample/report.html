@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<head>
+  <title>REPORT</title>
+  <link rel="stylesheet" type="text/css" href="report.css">
+  <img src="pics/report.png" alt="header image" width="100%">
+</head>
+<body>
+  <section>
+    <div class="container">
+      <h2 class="aligned-text">REPORT</h2>
+      <div class="rectangle">
+        <form action="/reports" method="post">
+          <div class="labels">
+            <label class="f1">Username to report:</label><br><br>
+            <label class="f4">Reason:</label><br><br>
+            <label class="f3">Enter Reason:</label><br><br>
+            <label class="f2">Detailed description:</label><br><br>
+          </div>
+          <div class="inputbox">
+            <input type="text" name="username" required placeholder="Enter username" class="b"><br><br>
+            <select name="reason_category" class="c">
+              <option value="Duplicated product">Duplicated product</option>
+              <option value="Not delivering product">Not delivering product</option>
+              <option value="other reasons">other reasons</option>
+            </select><br><br>
+            <input type="text" name="other_reason"  placeholder="Enter other reason" class="b"><br><br>
+            <input type="text" name="description" required placeholder="Enter detailed description" class="a"><br><br>
+          </div>
+          <div class="bt1">
+            <button type="submit" class="h">REPORT</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+  <script src="report.js"></script>
+</body>
+</html>

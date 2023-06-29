@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<head>
+  <title>ADD PRODUCT PAGE</title>
+  <link rel="stylesheet" type="text/css" href="addpro.css">
+  <img src="/img/a.jpg" alt="header image" width="100%">
+</head>
+<body>
+  <section>
+    <div class="container">
+      <h2 class="aligned-text">ENTER DETAILS</h2>
+      <div class="rectangle">
+        <form action="/submit-form" method="POST" enctype="multipart/formdata" id="myform"> <!-- Updated form action -->
+          <label class="f" for="name">Product name :</label>
+          <input type="text" name="name" id="name" required placeholder="Enter product name" class="e"><br><br> <!-- Added name attribute -->
+          <label class="f" for="category">Category :</label>
+          <select class="d" name="category" id="category"> <!-- Added name attribute -->
+            <option value="Furniture">Furniture</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Vehicle">Vehicle</option>
+            <option value="Fruits and vegetables">Fruits and vegetables</option> <!-- Corrected spelling -->
+            <option value="Electronics">Electronics</option>
+            <option value="Artwork">Artwork</option>
+            <option value="Other">Other</option>
+          </select><br><br>
+          <label class="f" for="description">Description :</label>
+          <input type="text" name="description" id="description" required placeholder="Enter product description" class="a"><br><br> <!-- Added name attribute -->
+          <label class="f" for="quantity">Enter Quantity :</label>
+          <input type="number" name="quantity" id="numb" required placeholder="Enter quantity" class="b"><br><br> <!-- Added name attribute -->
+          <label class="f" for="price">Enter Base Price :</label>
+          <input type="number" name="price"id="price" required placeholder="Enter Base Price" class="c"><br><br>
+          <label class="f" for="startDate">Ending Date:</label>
+          <input type="datetime-local" name="startDate" id="startDate"class="e" required><br><br>
+          <label for="image" class="f">UPLOAD IMAGES(Only jpeg,png format, max:4 images) :</label> <!-- Removed duplicate "for" attribute -->
+          <input type="file" id="image" class="l"  multiple /><br><br> <!-- Added name attribute and required attribute -->
+          <button class="h" type="submit" id="submitButton">SUBMIT</button>
+          
+        </form>
+      </div>
+    </div>
+  </section>
+  <script src="addpro.js"></script>
+</body>
+</html>

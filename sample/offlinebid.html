@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OFFLINE BIDDING DETAILS</title>
+        <link rel="stylesheet" type="text/css" href="offlinebid.css">
+        <img src="pics/offbid.png" alt="header image" width="100%">
+    </head>
+    <body>
+    <script src="/controllers/offlinebid.js"></script>
+    <div class="offbiddet">
+       
+        <div class="form-container">
+            <form name="myForm" class="my-form">
+                <div class="offlinebid">
+                    <h2>OFFLINE BIDDING DETAILS</h2>
+                </div>
+                <label for="Place of bidding">Place of bidding:</label>
+                <input type="text" id="place" name="place" required>
+                <br>
+                <label for="Bid Starting Time">Bid Starting Time:</label>
+                <input type="time" id="startTime" name="startTime" required>
+                <br>
+                <label for="Bid Ending Time">Bid Ending Time:</label>
+                <input type="time" id="endTime" name="endTime" required>
+                <br>
+                <label for="location">Loaction:</label>
+                <input type="text" id="location" name="location" required>
+                <br>
+                <label for="Date">Date:</label>
+                <input type="date" id="date" name="date" required>
+                <br>
+                <label for="Product">Product:</label>
+                <input type="text" id="product" name="product" required>
+                <br>
+                <div class="butt">
+                <button type="button" onclick="submitForm()">Submit</button>
+            </div>
+            </form>
+        </div>
+            
+        </div>
+    </div>
+    
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Forgot Password</title>
+  <style>
+    body{
+            background-image: url('/img/fpbg.png');
+            background-repeat: no-repeat; 
+            background-size: 1535px 753px;
+             }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 40px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 130px;
+      margin-left:535px;
+
+    }
+
+    h2 {
+      text-align:center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="email"] {
+      width: 94%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      display: block;
+      width: 99.2%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+    .logo {
+    padding-left: 2px;
+    padding-top: 2px;
+    width: 120px;
+    height: 8vh;
+}
+  </style>
+</head>
+<body>
+  <img src="/img/logo-black-removebg-preview.png" class="logo">
+  <div class="container">
+      <h2>Forgot Password</h2>
+      <form id="forgotPasswordForm">
+        
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required>
+          <!-- Rest of the form fields -->
+          <button type="submit">Reset Password</button>
+        
+      </form>
+  </div>
+<script>
+    // Handle form submission
+    document.getElementById('forgotPasswordForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var email = document.getElementById('email').value;
+
+      // Make an HTTP POST request to the server
+      fetch('http://localhost:3000/forgor-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email })
+      })
+        .then(function(response) {
+          if (response.ok) {
+            const currentemail=localStorage.setItem('forgotmail',email)
+            return response.json();
+          } else {
+            throw new Error('Failed to reset password');
+          }
+        })
+        .then(function(data) {
+          alert(data.message);
+        })
+        .catch(function(error) {
+          console.error(error);
+          alert('Failed to reset password');
+        });
+    });
+  </script>
+ 
+</body>
+</html>
