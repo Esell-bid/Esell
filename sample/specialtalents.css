@@ -2,8 +2,6 @@
   margin: 0;
   padding: 0;
   
-  box-sizing: border-box;
-  
 }
 .banner{
   width: 100%;
@@ -132,7 +130,7 @@ z-index: 2;
   justify-content: center;
   gap: 20px;
   padding: 20px;
-  margin-top:-200px;
+  margin-top:-350px;
 }
 
 .card {
@@ -201,13 +199,15 @@ div.card{
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   transform: translateY(-5px);
 }
+.products{
+  margin-top: 500px;
+}
 .all-products{
 	display: flex;
 	align-items: center;
     justify-content: center;
 	flex-wrap: wrap;
-   margin-top: 500px;
-   margin-bottom: 50px;
+    margin-left: 00px;
 }
 .product{
 	overflow: hidden;
@@ -224,7 +224,7 @@ div.card{
 	justify-content: center;
 	border-radius: 1.2rem;
     margin-left: 20px;
-   
+    margin-top: 10px;
 }
 .product .product-title, .product .product-price{
 	font-size: 18px;
