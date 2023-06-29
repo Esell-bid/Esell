@@ -201,26 +201,31 @@
 
   <script>
     // Function to start the timer
-   function startTimer(duration, display)  {
-      let timer = duration, hours, minutes, seconds;
-      setInterval(function () {
-        hours = parseInt(timer / 3600, 10);
-        minutes = parseInt((timer % 3600) / 60, 10);
-        seconds = parseInt(timer % 60, 10);
+    function startTimer(duration, display) {
+  let timer = duration;
+  let minutes, seconds;
 
-        hours = hours < 10 ? "0" + hours : hours;
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
+  const intervalId = setInterval(async function () {
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
 
-        display.textContent = hours + ":" + minutes + ":" + seconds;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        if (--timer < 0) {
-       
-          alert("Bid time has expired. The winner will be notified by email.");
-          console.log('Bid Completed');
-        }
-      }, 1000);
+    display.textContent = minutes + ":" + seconds;
+
+    if (--timer < 0) {
+      clearInterval(intervalId);
+
+      // Timer has ended, fetch the latest email
+      await fetchLatestEmail();
+      alert("Bid over time completed")
+      console.log("Bid completed")
+    }
+  }, 1000);
 }
+
+
 // Function to retrieve the latest email when the timer ends
 
 
@@ -387,25 +392,7 @@ const bt = document.createElement("div");
       // Start the timer
       startTimer(duration, timerDisplay);
     }
-    function retrieveLatestEmail() {
-  // Make an HTTP GET request to the server
-  fetch('http://localhost:3000/latest-email')
-    .then(response => response.json())
-    .then(data => {
-      if (data.email) {
-        const latestEmail = data.email;
-        // Save the latest email to the winners collection or perform any other necessary actions
-        // ...
-        console.log('Latest email:', latestEmail);
-      } else {
-        console.log('No email found');
-      }
-      console.log('email:', latestEmail);
-    })
-    .catch(error => {
-      console.error('Error retrieving latest email:', error);
-    });
-}
+ 
 
 
 // ...
@@ -424,8 +411,23 @@ const bt = document.createElement("div");
 
       return hours + ":" + minutes + ":" + seconds;
     }
-    
-    retrieveLatestEmail();
+    async function fetchLatestEmail() {
+      try {
+        const response = await fetch('http://localhost:3000/latest-email');
+        const data = await response.json();
+
+        if (response.ok) {
+          const latestEmail = data.email;
+          console.log('Latest email:', latestEmail);
+          // Use the latestEmail as needed in your client-side code
+        } else {
+          console.error('Error fetching latest email:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching latest email:', error);
+      }
+    }
+
     fetchProductDetails();
     
   </script>
