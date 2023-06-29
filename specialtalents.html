@@ -34,94 +34,91 @@
       
         <img src="img/sptl.png" class="mimage">
   </div>
-        <form>
-            <input type="search" class="search-bar" placeholder="Search...">
-            <input type="submit" value="Search" class="search">
-        </form>
-      
-      
       <section class="products">
               <div class="all-products" id="productContainer">
                   <!-- Product placeholders -->
               </div>
       </section>
       
-         
+       <script>  
       
   
-      <script>
-                         function displayProductDetails(acceptedproducts) {
-    const productContainer = document.getElementById('productContainer');
-  
-    acceptedproducts.forEach((product) => {
-      if (product.category === selectedCategory) {
-        console.log(product); // Log the product data for debugging
-  
-        const productDiv = document.createElement('div');
-        productDiv.classList.add('product');
-  
-        const productLink = document.createElement("a");
-        productLink.href = `/pdetails.html?id=${product._id}`;
-        productLink.appendChild(productDiv);
-        productContainer.appendChild(productLink);
-  
-        const productImage = document.createElement('img');
-        productImage.src = product.images[0]; // Display the first image
-  
-        const productInfoDiv = document.createElement('div');
-        productInfoDiv.classList.add('product-info');
-  
-        const productName = document.createElement('h4');
-        productName.classList.add('product-title');
-        productName.textContent = product.name;
-  
-        const productPrice = document.createElement('p');
-        productPrice.classList.add('product-price');
-        productPrice.textContent = 'Price: ' + product.price;
-  
-        const bidButton = document.createElement('button');
-        bidButton.classList.add('product-btn');
-        bidButton.textContent = 'Bid Now';
-  
-        bidButton.addEventListener('click', () => {
-          window.location.href = '/pdetails.html?id=' + product._id;
-          console.log('Bid Now button clicked for product:', product.name);
-        });
-  
-        productInfoDiv.appendChild(productName);
-        productInfoDiv.appendChild(productPrice);
-        productDiv.appendChild(productImage);
-        productDiv.appendChild(productInfoDiv);
-        productInfoDiv.appendChild(bidButton);
-        productContainer.appendChild(productDiv);
-      }
-    });
-  }
-  
-          async function fetchProductDetails(selectedCategory) {
-    try {
-      const response = await fetch('http://localhost:3000/acceptedproducts');
-      const acceptedproducts = await response.json();
-  
-      if (response.ok) {
-        displayProductDetails(acceptedproducts, selectedCategory);
-      } else {
-        console.error('Error fetching product details:', acceptedproducts.error);
-      }
-    } catch (error) {
-      console.error('Error fetching product details:', error);
-    }
-  }
-  
-  
-  // Example usage: Fetch and display products with category "Electronics"
-          const selectedCategory = 'Fruits and vegetables';
-          fetchProductDetails(selectedCategory);
-  
-            
-                </script>
-  </body>
-</script>
+      // Generate product cards using map function
+      function displayProductDetails(products, isDisabled) {
+        const productContainer = document.getElementById('productContainer');
+        productContainer.innerHTML = ''; // Clear previous product cards
+    
+        products.forEach(product => {
+          // Perform filtering based on the user's disabled status
+          if (isDisabled) {
+            console.log(product);
+            const productDiv = document.createElement('div');
+      productDiv.classList.add('product');
 
+      const productLink = document.createElement("a");
+      productLink.href = `/p.html?id=${product._id}`;
+      productLink.appendChild(productDiv);
+      productContainer.appendChild(productLink);
+
+      const productImage = document.createElement('img');
+      productImage.src = product.images[0]; // Display the first image
+
+      const productInfoDiv = document.createElement('div');
+      productInfoDiv.classList.add('product-info');
+
+      const productName = document.createElement('h4');
+      productName.classList.add('product-title');
+      productName.textContent = product.name;
+
+      const productPrice = document.createElement('p');
+      productPrice.classList.add('product-price');
+      productPrice.textContent = 'Price: ' + product.price;
+
+      const bidButton = document.createElement('button');
+      bidButton.classList.add('product-btn');
+      bidButton.textContent = 'Bid Now';
+
+      bidButton.addEventListener('click', () => {
+        window.location.href = '/pdetails.html?id=' + product._id;
+        console.log('Bid Now button clicked for product:', product.name);
+      });
+
+      productInfoDiv.appendChild(productName);
+      productInfoDiv.appendChild(productPrice);
+      productDiv.appendChild(productImage);
+      productDiv.appendChild(productInfoDiv);
+      productInfoDiv.appendChild(bidButton);
+      productContainer.appendChild(productDiv);
+          }
+        });
+      }
+    
+      async function fetchProductDetails() {
+      try {
+        const productResponse = await fetch('http://localhost:3000/acceptedProduct');
+        if (!productResponse.ok) {
+          throw new Error(`Error fetching product details: ${productResponse.status} ${productResponse.statusText}`);
+        }
+        const acceptedProduct = await productResponse.json();
+
+        const userResponse = await fetch('http://localhost:3000/users');
+        if (!userResponse.ok) {
+          throw new Error(`Error fetching user details: ${userResponse.status} ${userResponse.statusText}`);
+        }
+        const users = await userResponse.json();
+
+        // Iterate over each user
+        users.forEach(user => {
+          const isDisabled = user.isDisabled;
+          displayProductDetails(acceptedProduct, isDisabled);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Example usage: Fetch and display product details based on the user's disabled status
+    fetchProductDetails();
+  </script>
 </body>
 </html>
